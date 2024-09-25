@@ -11,7 +11,13 @@
         <el-button type="primary" plain style="font-size: large" @click="clickLogin"
           >登录</el-button
         >
-        <el-button type="primary" plain style="margin-left: 5vw; font-size: large">注册</el-button>
+        <el-button
+          type="primary"
+          plain
+          style="margin-left: 5vw; font-size: large"
+          @click="clickRegister"
+          >注册</el-button
+        >
       </div>
     </Transition>
     <Transition name="fade">
@@ -19,13 +25,87 @@
         <h1>登录</h1>
         <el-form :model="login" label-width="auto" style="max-width: 600px">
           <el-form-item label="用户名">
-            <el-input v-model="login.name" placeholder="username"></el-input>
+            <el-input v-model="login.name" placeholder="请输入用户名"></el-input>
           </el-form-item>
           <el-form-item label="密码">
-            <el-input v-model="login.password" placeholder="password"></el-input>
+            <el-input v-model="login.password" placeholder="请输入密码" show-password></el-input>
           </el-form-item>
           <el-button type="primary" round plain @click="clickReturn">返回</el-button>
           <el-button type="primary" round plain>登录</el-button>
+        </el-form>
+      </div>
+    </Transition>
+    <Transition name="fade">
+      <div v-if="registerVisible" class="register">
+        <h1>注册</h1>
+        <el-form :model="register" label-width="auto" style="max-width: 600px">
+          <el-form-item
+            label="用户名"
+            prop="name"
+            :rules="[
+              { required: true, message: '用户名不能为空', trigger: 'blur' },
+              { min: 6, message: '用户名至少6个字符', trigger: 'blur' }
+            ]"
+          >
+            <el-input v-model="register.name" placeholder="请输入用户名"></el-input>
+          </el-form-item>
+          <el-form-item
+            label="密码"
+            prop="password"
+            :rules="[
+              { required: true, message: '密码不能为空', trigger: 'blur' },
+              { min: 6, message: '密码至少6个字符', trigger: 'blur' }
+            ]"
+          >
+            <el-input v-model="register.password" placeholder="请输入密码" show-password></el-input>
+          </el-form-item>
+          <el-form-item
+            label="确认密码"
+            prop="repassword"
+            :rules="[
+              { required: true, message: '请确认密码', trigger: 'blur' },
+              { validator: validateRepassword, trigger: 'blur' }
+            ]"
+          >
+            <el-input
+              v-model="register.repassword"
+              placeholder="请再次输入密码"
+              show-password
+            ></el-input>
+          </el-form-item>
+          <el-form-item
+            label="邮箱绑定"
+            prop="email"
+            :rules="[
+              { required: true, message: '邮箱不能为空', trigger: 'blur' },
+              { type: 'email', message: '邮箱格式不正确', trigger: ['blur', 'change'] }
+            ]"
+            inline
+          >
+            <el-input
+              v-model="register.email"
+              placeholder="请输入您绑定的邮箱"
+              style="width: 60%"
+            ></el-input>
+            <el-button type="primary" @click="getVerificationCode" style="margin-left: 10px"
+              >获取验证码</el-button
+            >
+          </el-form-item>
+          <el-form-item
+            label="验证码"
+            prop="justifyCode"
+            :rules="[
+              { required: true, message: '验证码不能为空', triggerL: 'blur' },
+              { min: 6, max: 6, message: '验证码格式错误', trigger: 'blur' }
+            ]"
+          >
+            <el-input
+              v-model="register.justifyCode"
+              placeholder="请输入您邮箱收到的验证码"
+            ></el-input>
+          </el-form-item>
+          <el-button type="primary" round plain @click="clickReturn">返回</el-button>
+          <el-button type="primary" round plain @click="submitRegister">注册</el-button>
         </el-form>
       </div>
     </Transition>
@@ -40,16 +120,27 @@ const login = ref({
   password: ''
 })
 
+const register = ref({
+  name: '',
+  password: '',
+  repassword: '',
+  email: '',
+  justifyCode: ''
+})
+
 const loginVisible = ref(false)
 const homeVisible = ref(true)
 const moveUP = ref(false)
+const registerVisible = ref(false)
 
-// const clickLogin = () => {
-//   homeVisible.value = false
-//   setTimeout(() => {
-//     loginVisible.value = true
-//   }, 500); // 500毫秒后显示login
-// }
+const validateRepassword = (rule, value, callback) => {
+  if (value === '' || value === register.value.password) {
+    callback()
+  } else {
+    callback(new Error('确认密码与密码不一致'))
+  }
+}
+
 const clickLogin = () => {
   // 开始向上移动
   moveUP.value = true // 先隐藏 login
@@ -61,12 +152,33 @@ const clickLogin = () => {
   }, 100) // 向上移动的时间
 }
 
+const clickRegister = () => {
+  // 开始向上移动
+  moveUP.value = true // 先隐藏 login
+  setTimeout(() => {
+    homeVisible.value = false // 隐藏按钮
+    setTimeout(() => {
+      registerVisible.value = true // 按钮完全消失后显示 login
+    }, 500) // 按钮消失的时间
+  }, 100) // 向上移动的时间
+}
+
 const clickReturn = () => {
   moveUP.value = false
   loginVisible.value = false
+  registerVisible.value = false
   setTimeout(() => {
     homeVisible.value = true
   }, 500) // 500毫秒后显示button
+}
+
+const getVerificationCode = () => {
+  alert('获取验证码')
+}
+
+const submitRegister = () => {
+  // 提交注册逻辑
+  console.log('注册信息:', register.value)
 }
 </script>
 
@@ -90,16 +202,6 @@ const clickReturn = () => {
   display: block;
   /* background-color: pink; */
 }
-
-/* .header {
-  margin-top: 1vh;
-  margin-bottom: 0;
-  font-size: 5vw;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
-    sans-serif;
-  font-weight: 700;
-  color: #f3a048;
-} */
 
 .header {
   margin-top: 1vh;
@@ -138,7 +240,8 @@ const clickReturn = () => {
   margin-top: 6vh;
 }
 
-.login {
+.login,
+.register {
   margin-top: 4vh;
   display: flex;
   flex-direction: column;
@@ -147,7 +250,8 @@ const clickReturn = () => {
   text-align: center;
 }
 
-.login h1 {
+.login h1,
+.register h1 {
   font-size: 1.5rem; /* 增加字体大小 */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
   margin-bottom: 3vh; /* 添加下边距 */
