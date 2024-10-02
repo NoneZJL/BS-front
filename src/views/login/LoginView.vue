@@ -1,6 +1,9 @@
 <template>
-  <div v-if="showMessage" class="custom-message" :style="{ top: messageTop + 'px' }">
-    {{ message }}
+  <div v-if="showSuccessMessage" class="success-message" :style="{ top: messageTop + 'px' }">
+    {{ successMessage }}
+  </div>
+  <div v-if="showFailMessage" class="fail-message" :style="{ top: messageTop + 'px' }">
+    {{ failMessage }}
   </div>
   <div :class="['login-page', { 'move-up': moveUP }]">
     <div style="display: block">
@@ -38,7 +41,7 @@
             <el-input v-model="login.password" placeholder="请输入密码" show-password></el-input>
           </el-form-item>
           <el-button type="primary" round plain @click="clickReturn">返回</el-button>
-          <el-button type="primary" round plain>登录</el-button>
+          <el-button type="primary" round plain @click="userLogin">登录</el-button>
           <br /><br />
           <span class="forgot-password" @click="handleForgotPassword">忘记密码？</span>
         </el-form>
@@ -189,8 +192,10 @@ const clickReturn = () => {
 
 const verificationCountdown = ref(30)
 const countdownActive = ref(false)
-const showMessage = ref(false)
-const message = ref('')
+const showSuccessMessage = ref(false)
+const successMessage = ref('')
+const showFailMessage = ref(false)
+const failMessage = ref('')
 const messageTop = ref(20) // 自定义顶部位置
 
 const getVerificationCode = () => {
@@ -199,12 +204,13 @@ const getVerificationCode = () => {
   countdownActive.value = true // 开始倒计时
 
   // 设置提示信息
-  message.value = '验证码已发送！'
-  showMessage.value = true
+  successMessage.value = '验证码已发送！'
+  showSuccessMessage.value = true
 
   // 设置 3 秒后自动隐藏提示
   setTimeout(() => {
-    showMessage.value = false
+    showSuccessMessage.value = false
+    successMessage.value = ''
   }, 3000)
 
   const countdownInterval = setInterval(() => {
@@ -228,20 +234,43 @@ const submitRegister = () => {
   // 提交注册逻辑
   console.log('注册信息:', register.value)
 }
+
+const userLogin = () => {
+  successMessage.value = '登录成功'
+  showSuccessMessage.value = true
+  setTimeout(() => {
+    showSuccessMessage.value = false
+    successMessage.value = ''
+    router.push('/query')
+  }, 500)
+}
 </script>
 
 <style scoped>
-.custom-message {
+.success-message {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #f0f9eb; /* 背景色 */
-  border: 1px solid #b7eb8f; /* 边框颜色 */
-  color: #4caf50; /* 字体颜色 */
+  background-color: #f0f9eb;
+  border: 1px solid #b7eb8f;
+  color: #4caf50;
   padding: 10px 20px;
   border-radius: 5px;
-  z-index: 9999; /* 确保在其他内容上面 */
-  transition: opacity 0.5s ease; /* 动画效果 */
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+
+.fail-message {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fef0f0;
+  border: 1px solid #fde2e2;
+  color: #f56c6c;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
 }
 
 .login-page {

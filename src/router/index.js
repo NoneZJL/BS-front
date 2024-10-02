@@ -14,6 +14,10 @@ const router = createRouter({
     {
       path: '/find',
       component: () => import('@/views/login/ForgetPasswordView.vue')
+    },
+    {
+      path: '/query',
+      component: () => import('@/views/using/queryView.vue')
     }
   ]
 })
