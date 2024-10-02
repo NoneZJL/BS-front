@@ -130,7 +130,7 @@
 </template>
 
 <script setup>
-import router from '@/router'
+import router from '@/router/index'
 import { ref } from 'vue'
 
 const login = ref({
