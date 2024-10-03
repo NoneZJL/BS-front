@@ -18,6 +18,10 @@ const router = createRouter({
     {
       path: '/query',
       component: () => import('@/views/using/queryView.vue')
+    },
+    {
+      path: '/home',
+      component: () => import('@/views/home/HomeIndexView.vue')
     }
   ]
 })
