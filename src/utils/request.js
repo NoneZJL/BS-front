@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 import router from '@/router'
 // import { showFullScreenLoading, tryHideFullScreenLoading } from './serviceHelp'
 
-const baseURL = '/'
+const baseURL = 'http://localhost:8082'
 
 const instance = axios.create({
   // TODO 1. 基础地址，超时时间

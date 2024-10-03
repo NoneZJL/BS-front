@@ -130,6 +130,7 @@
 </template>
 
 <script setup>
+import { helloService } from '@/api/user'
 import router from '@/router/index'
 import { ref } from 'vue'
 
@@ -235,7 +236,9 @@ const submitRegister = () => {
   console.log('注册信息:', register.value)
 }
 
-const userLogin = () => {
+const userLogin = async () => {
+  const res = await helloService()
+  console.log(res)
   successMessage.value = '登录成功'
   showSuccessMessage.value = true
   setTimeout(() => {
