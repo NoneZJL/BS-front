@@ -130,9 +130,12 @@
 </template>
 
 <script setup>
-import { helloService } from '@/api/user'
+import { userLoginService } from '@/api/user'
 import router from '@/router/index'
 import { ref } from 'vue'
+import { useUserStore } from '@/stores/index'
+
+const userStore = useUserStore()
 
 const login = ref({
   name: '',
@@ -237,15 +240,25 @@ const submitRegister = () => {
 }
 
 const userLogin = async () => {
-  const res = await helloService()
-  console.log(res)
+  const res = await userLoginService(login.value.name, login.value.password)
+  if (res.data.code === 1) {
+    failMessage.value = res.data.err
+    showFailMessage.value = true
+    login.value.password = ''
+    setTimeout(() => {
+      showFailMessage.value = false
+      failMessage.value = ''
+    }, 2000)
+    return
+  }
   successMessage.value = '登录成功'
   showSuccessMessage.value = true
+  userStore.setToken(res.data.payload)
   setTimeout(() => {
     showSuccessMessage.value = false
     successMessage.value = ''
-    router.push('/query')
   }, 500)
+  router.push('/query')
 }
 </script>
 
