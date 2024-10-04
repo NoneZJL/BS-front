@@ -50,50 +50,27 @@
     <Transition name="fade">
       <div v-if="registerVisible" class="register">
         <h1>注册</h1>
-        <el-form :model="register" label-width="auto" style="max-width: 600px">
-          <el-form-item
-            label="用户名"
-            prop="name"
-            :rules="[
-              { required: true, message: '用户名不能为空', trigger: 'blur' },
-              { min: 6, message: '用户名至少6个字符', trigger: 'blur' }
-            ]"
-          >
+        <el-form
+          ref="registerForm"
+          :model="register"
+          label-width="auto"
+          style="max-width: 600px"
+          :rules="registerRules"
+        >
+          <el-form-item label="用户名" prop="name">
             <el-input v-model="register.name" placeholder="请输入用户名"></el-input>
           </el-form-item>
-          <el-form-item
-            label="密码"
-            prop="password"
-            :rules="[
-              { required: true, message: '密码不能为空', trigger: 'blur' },
-              { min: 6, message: '密码至少6个字符', trigger: 'blur' }
-            ]"
-          >
+          <el-form-item label="密码" prop="password">
             <el-input v-model="register.password" placeholder="请输入密码" show-password></el-input>
           </el-form-item>
-          <el-form-item
-            label="确认密码"
-            prop="repassword"
-            :rules="[
-              { required: true, message: '请确认密码', trigger: 'blur' },
-              { validator: validateRepassword, trigger: 'blur' }
-            ]"
-          >
+          <el-form-item label="确认密码" prop="repassword">
             <el-input
               v-model="register.repassword"
               placeholder="请再次输入密码"
               show-password
             ></el-input>
           </el-form-item>
-          <el-form-item
-            label="邮箱绑定"
-            prop="email"
-            :rules="[
-              { required: true, message: '邮箱不能为空', trigger: 'blur' },
-              { type: 'email', message: '邮箱格式不正确', trigger: ['blur', 'change'] }
-            ]"
-            inline
-          >
+          <el-form-item label="邮箱绑定" prop="email" inline>
             <el-input
               v-model="register.email"
               placeholder="请输入您绑定的邮箱"
@@ -108,14 +85,7 @@
               {{ countdownActive ? `${verificationCountdown}秒后重试` : '获取验证码' }}
             </el-button>
           </el-form-item>
-          <el-form-item
-            label="验证码"
-            prop="justifyCode"
-            :rules="[
-              { required: true, message: '验证码不能为空', triggerL: 'blur' },
-              { min: 6, max: 6, message: '验证码格式错误', trigger: 'blur' }
-            ]"
-          >
+          <el-form-item label="验证码" prop="justifyCode">
             <el-input
               v-model="register.justifyCode"
               placeholder="请输入您邮箱收到的验证码"
@@ -130,7 +100,7 @@
 </template>
 
 <script setup>
-import { userLoginService } from '@/api/user'
+import { getEmailCodeService, userLoginService, userRegisterService } from '@/api/user'
 import router from '@/router/index'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/index'
@@ -202,11 +172,23 @@ const showFailMessage = ref(false)
 const failMessage = ref('')
 const messageTop = ref(20) // 自定义顶部位置
 
-const getVerificationCode = () => {
+const getVerificationCode = async () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(register.value.email)) {
+    failMessage.value = '邮箱格式不正确'
+    showFailMessage.value = true
+    setTimeout(() => {
+      showFailMessage.value = false
+      failMessage.value = ''
+    }, 3000)
+    return
+  }
+
+  const res = await getEmailCodeService(register.value.email)
+  console.log(res)
+  userStore.setEmailCode(res.data.payload)
   if (countdownActive.value) return // 如果已经在倒计时，直接返回
-
   countdownActive.value = true // 开始倒计时
-
   // 设置提示信息
   successMessage.value = '验证码已发送！'
   showSuccessMessage.value = true
@@ -228,15 +210,48 @@ const getVerificationCode = () => {
 }
 
 const handleForgotPassword = () => {
-  // 处理忘记密码逻辑
   console.log('点击了忘记密码')
   router.push('/find')
-  // 可以跳转到一个新的页面或弹出对话框
 }
 
 const submitRegister = () => {
-  // 提交注册逻辑
-  console.log('注册信息:', register.value)
+  registerForm.value.validate(async (valid) => {
+    if (valid) {
+      const res = await userRegisterService(
+        register.value.name,
+        register.value.password,
+        register.value.email,
+        register.value.justifyCode,
+        userStore.emailCode
+      )
+      if (res.data.code === 1) {
+        failMessage.value = res.data.err
+        showFailMessage.value = true
+        setTimeout(() => {
+          showFailMessage.value = false
+          failMessage.value = ''
+        }, 3000)
+        return
+      }
+      userStore.removeEmailCode()
+      register.value.name = ''
+      register.value.password = ''
+      register.value.repassword = ''
+      register.value.email = ''
+      register.value.justifyCode = ''
+      successMessage.value = '注册成功'
+      showSuccessMessage.value = true
+      setTimeout(() => {
+        showSuccessMessage.value = false
+        successMessage.value = ''
+        registerVisible.value = false
+        loginVisible.value = true
+      }, 1000)
+    } else {
+      console.log('表单验证失败')
+      return false
+    }
+  })
 }
 
 const userLogin = async () => {
@@ -259,6 +274,31 @@ const userLogin = async () => {
     successMessage.value = ''
   }, 500)
   router.push('/query')
+}
+
+const registerForm = ref(null)
+
+const registerRules = {
+  name: [
+    { required: true, message: '用户名不能为空', trigger: 'blur' },
+    { min: 6, message: '用户名至少6个字符', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '密码不能为空', trigger: 'blur' },
+    { min: 6, message: '密码至少6个字符', trigger: 'blur' }
+  ],
+  repassword: [
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    { validator: validateRepassword, trigger: 'blur' }
+  ],
+  email: [
+    { required: true, message: '邮箱不能为空', trigger: 'blur' },
+    { type: 'email', message: '邮箱格式不正确', trigger: ['blur', 'change'] }
+  ],
+  justifyCode: [
+    { required: true, message: '验证码不能为空', trigger: 'blur' },
+    { min: 6, max: 6, message: '验证码格式错误', trigger: 'blur' }
+  ]
 }
 </script>
 

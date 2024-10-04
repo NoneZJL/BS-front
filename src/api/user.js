@@ -1,9 +1,9 @@
 import request from '@/utils/request'
 
-export const userRegisterService = ({ username, password, repassword }) =>
-  request.post('/api/login', { username, password, repassword })
-
-export const helloService = () => request.get('/hello')
-
 export const userLoginService = (username, password) =>
   request.post('/login', { username, password })
+
+export const getEmailCodeService = (email) => request.get(`/getEmailCode?email=${email}`)
+
+export const userRegisterService = (username, password, email, emailCode, lastEmailCode) =>
+  request.post('/register', { username, password, email, emailCode, lastEmailCode })
