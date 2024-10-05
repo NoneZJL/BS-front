@@ -7,7 +7,12 @@
     <div class="find-password">
       <span class="title">找回密码</span>
       <p></p>
-      <el-form :model="findback" label-width="auto" style="max-width: 600px; margin: 0 auto">
+      <el-form
+        ref="findbackForm"
+        :model="findback"
+        label-width="auto"
+        style="max-width: 600px; margin: 0 auto"
+      >
         <el-form-item
           label="邮箱绑定"
           prop="email"
@@ -90,6 +95,10 @@
 <script setup>
 import router from '@/router'
 import { ref } from 'vue'
+import { getEmailCodeInForgetPasswordService, modifyPasswordService } from '@/api/user'
+import { useUserStore } from '@/stores/index'
+
+const userStore = useUserStore()
 
 const back = () => {
   router.push('/login')
@@ -99,7 +108,7 @@ const findback = ref({
   email: '',
   justifyCode: '',
   password: '',
-  repsssword: ''
+  repassword: ''
 })
 
 const validateRepassword = (rule, value, callback) => {
@@ -116,20 +125,26 @@ const showMessage = ref(false)
 const message = ref('')
 const messageTop = ref(20) // 自定义顶部位置
 
-const getVerificationCode = () => {
+const findbackForm = ref(null)
+
+const getVerificationCode = async () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(findback.value.email)) {
+    ElMessage.error('邮箱格式不正确')
+    return
+  }
+
   if (countdownActive.value) return // 如果已经在倒计时，直接返回
 
+  const res = await getEmailCodeInForgetPasswordService(findback.value.email)
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  userStore.setEmailCode(res.data.payload)
+  ElMessage.success('验证码发送成功')
+
   countdownActive.value = true // 开始倒计时
-
-  // 设置提示信息
-  message.value = '验证码已发送！'
-  showMessage.value = true
-
-  // 设置 3 秒后自动隐藏提示
-  setTimeout(() => {
-    showMessage.value = false
-  }, 3000)
-
   const countdownInterval = setInterval(() => {
     verificationCountdown.value--
     if (verificationCountdown.value <= 0) {
@@ -140,8 +155,36 @@ const getVerificationCode = () => {
   }, 1000)
 }
 
-const submit = () => {
-  alert('修改密码')
+const submit = async () => {
+  findbackForm.value.validate((valid) => {
+    if (!valid) {
+      ElMessage.error('部分内容输入格式有误')
+      return
+    }
+
+    // 如果验证通过，继续执行后续操作
+    modifyPassword()
+  })
+}
+
+const modifyPassword = async () => {
+  const res = await modifyPasswordService(
+    findback.value.email,
+    findback.value.password,
+    findback.value.justifyCode,
+    userStore.emailCode
+  )
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  findback.value.email = ''
+  findback.value.justifyCode = ''
+  findback.value.password = ''
+  findback.value.repassword = ''
+  userStore.removeEmailCode()
+  ElMessage.success('密码修改成功')
+  router.push('/login')
 }
 </script>
 

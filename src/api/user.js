@@ -12,3 +12,9 @@ export const getUserInfoService = () => request.get('/getUserInfo')
 
 export const updateUserInfoService = (phone, address) =>
   request.post('/updateUserInfo', { phone, address })
+
+export const getEmailCodeInForgetPasswordService = (email) =>
+  request.get(`/getEmailCodeInForgetPassword?email=${email}`)
+
+export const modifyPasswordService = (email, password, newEmailCode, lastEmailCode) =>
+  request.post('/updatePassword', { email, password, newEmailCode, lastEmailCode })

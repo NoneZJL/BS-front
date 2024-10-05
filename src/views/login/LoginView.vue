@@ -102,7 +102,7 @@
 <script setup>
 import { getEmailCodeService, userLoginService, userRegisterService } from '@/api/user'
 import router from '@/router/index'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/index'
 
 const userStore = useUserStore()
@@ -124,6 +124,12 @@ const loginVisible = ref(false)
 const homeVisible = ref(true)
 const moveUP = ref(false)
 const registerVisible = ref(false)
+
+onMounted(() => {
+  userStore.removeEmailCode()
+  userStore.removeToken()
+  userStore.removeUsername()
+})
 
 const validateRepassword = (rule, value, callback) => {
   if (value === '' || value === register.value.password) {
