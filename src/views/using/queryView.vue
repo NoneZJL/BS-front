@@ -91,15 +91,18 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import router from '@/router/index'
 import { useUserStore } from '@/stores/index'
 
 const username = ref('username')
 const search = ref('')
 const userStore = useUserStore()
-
 const activeWebsite = ref('jd')
+
+onMounted(() => {
+  username.value = userStore.username
+})
 
 const jdProducts = ref([
   { name: '京东1', price: 100, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
@@ -198,6 +201,7 @@ const confirmLogout = () => {
   })
     .then(() => {
       userStore.removeToken()
+      userStore.removeUsername()
       logout()
     })
     .catch(() => {})

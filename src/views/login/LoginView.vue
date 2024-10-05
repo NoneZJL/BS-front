@@ -269,6 +269,7 @@ const userLogin = async () => {
   successMessage.value = '登录成功'
   showSuccessMessage.value = true
   userStore.setToken(res.data.payload)
+  userStore.setUsername(login.value.name)
   setTimeout(() => {
     showSuccessMessage.value = false
     successMessage.value = ''

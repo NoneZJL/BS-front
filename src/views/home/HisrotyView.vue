@@ -49,7 +49,7 @@
 
 <script setup>
 import router from '@/router'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/index'
 
 const username = ref('Tom')
@@ -65,6 +65,10 @@ const history = ref([
   'history9'
 ])
 const userStore = useUserStore()
+
+onMounted(() => {
+  username.value = userStore.username
+})
 
 const jumpHome = () => {
   router.push('/home')
