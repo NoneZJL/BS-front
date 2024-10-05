@@ -354,8 +354,9 @@ const registerRules = {
   margin-top: 1vh;
   margin-bottom: 0;
   font-size: 5vw;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
-    sans-serif;
+  /* font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
+    sans-serif; */
+  font-family: 'Pacifico', cursive;
   font-weight: 700;
   background: linear-gradient(
     270deg,

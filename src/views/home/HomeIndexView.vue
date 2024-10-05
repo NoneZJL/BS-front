@@ -209,6 +209,7 @@ const submitEditForm = async () => {
   background-clip: text;
   color: transparent;
   animation: gradient 15s ease infinite;
+  font-family: 'Pacifico', cursive;
 }
 
 @keyframes gradient {
