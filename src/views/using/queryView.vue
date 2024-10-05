@@ -16,6 +16,7 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="jumpHome">个人主页</el-dropdown-item>
+                <el-dropdown-item @click="jumpHistory">历史记录</el-dropdown-item>
                 <el-dropdown-item @click="confirmLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -65,7 +66,7 @@
               :md="8"
               :lg="6"
               :xl="4"
-              v-for="(item, index) in products"
+              v-for="(item, index) in currentProducts"
               :key="index"
             >
               <el-card :body-style="{ padding: '0px' }" class="product-card">
@@ -76,6 +77,9 @@
                     <span class="price">¥{{ item.price }}</span>
                     <el-button type="text" class="button">查看详情</el-button>
                   </div>
+                  <!-- <div class="content">
+                    <span>{{ item.content }}</span>
+                  </div> -->
                 </div>
               </el-card>
             </el-col>
@@ -87,27 +91,103 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import router from '@/router/index'
+import { useUserStore } from '@/stores/index'
 
 const username = ref('username')
 const search = ref('')
+const userStore = useUserStore()
 
 const activeWebsite = ref('jd')
 
-const products = ref([
-  { name: '商品1', price: 100, image: 'https://via.placeholder.com/150' },
-  { name: '商品2', price: 200, image: 'https://via.placeholder.com/150' },
-  { name: '商品3', price: 300, image: 'https://via.placeholder.com/150' },
-  { name: '商品4', price: 400, image: 'https://via.placeholder.com/150' },
-  { name: '商品5', price: 500, image: 'https://via.placeholder.com/150' },
-  { name: '商品6', price: 600, image: 'https://via.placeholder.com/150' },
-  { name: '商品7', price: 700, image: 'https://via.placeholder.com/150' },
-  { name: '商品8', price: 800, image: 'https://via.placeholder.com/150' }
+const jdProducts = ref([
+  { name: '京东1', price: 100, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '京东2', price: 200, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '京东3', price: 300, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '京东4', price: 400, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '京东5', price: 500, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '京东6', price: 600, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '京东7', price: 700, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '京东8', price: 800, image: 'https://via.placeholder.com/150', content: '这是物品见解' }
 ])
+
+const tbProducts = ref([
+  { name: '淘宝1', price: 100, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '淘宝2', price: 200, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '淘宝3', price: 300, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '淘宝4', price: 400, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '淘宝5', price: 500, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '淘宝6', price: 600, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '淘宝7', price: 700, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
+  { name: '淘宝8', price: 800, image: 'https://via.placeholder.com/150', content: '这是物品见解' }
+])
+
+const pddProducts = ref([
+  {
+    name: '拼多多1',
+    price: 100,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    name: '拼多多2',
+    price: 200,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    name: '拼多多3',
+    price: 300,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    name: '拼多多4',
+    price: 400,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    name: '拼多多5',
+    price: 500,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    name: '拼多多6',
+    price: 600,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    name: '拼多多7',
+    price: 700,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  { name: '拼多多8', price: 800, image: 'https://via.placeholder.com/150', content: '这是物品见解' }
+])
+
+const currentProducts = computed(() => {
+  switch (activeWebsite.value) {
+    case 'jd':
+      return jdProducts.value
+    case 'tb':
+      return tbProducts.value
+    case 'pdd':
+      return pddProducts.value
+    default:
+      return []
+  }
+})
 
 const jumpHome = () => {
   router.push('/home')
+}
+
+const jumpHistory = () => {
+  router.push('/history')
 }
 
 const confirmLogout = () => {
@@ -117,6 +197,7 @@ const confirmLogout = () => {
     type: 'warning'
   })
     .then(() => {
+      userStore.removeToken()
       logout()
     })
     .catch(() => {})
@@ -250,5 +331,11 @@ const handleClick = (tab) => {
 .button {
   padding: 0;
   min-height: auto;
+}
+
+.content {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #606266;
 }
 </style>

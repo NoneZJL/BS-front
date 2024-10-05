@@ -15,33 +15,33 @@
             </el-icon>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="jumpHistory">历史记录</el-dropdown-item>
+                <el-dropdown-item @click="jumpHome">个人主页</el-dropdown-item>
                 <el-dropdown-item @click="confirmLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <span>{{ userInfo.username }}</span>
+          <span>{{ username }}</span>
         </div>
       </el-header>
       <el-main>
         <el-button type="info" plain @click="back">返回</el-button>
-        <el-card class="user-info-card">
-          <div class="user-info-header">
-            <el-icon class="user-icon"><User /></el-icon>
-            <div class="user-info-details">
-              <div class="user-name">{{ userInfo.username }}</div>
-              <div class="user-email">{{ userInfo.email }}</div>
-            </div>
-          </div>
-          <div class="user-info-body">
-            <el-descriptions title="个人信息" :column="1">
-              <el-descriptions-item label="用户名">{{ userInfo.username }}</el-descriptions-item>
-              <el-descriptions-item label="邮箱">{{ userInfo.email }}</el-descriptions-item>
-              <el-descriptions-item label="手机号">{{ userInfo.phone }}</el-descriptions-item>
-              <el-descriptions-item label="地址">{{ userInfo.address }}</el-descriptions-item>
-            </el-descriptions>
-          </div>
-        </el-card>
+        <div class="history-container">
+          <el-card class="history-card">
+            <div class="history-title">历史记录</div>
+            <el-scrollbar height="400px">
+              <ul class="history-list">
+                <li
+                  v-for="(item, index) in history"
+                  :key="index"
+                  @click="handleHistoryClick(item)"
+                  class="history-item"
+                >
+                  {{ item }}
+                </li>
+              </ul>
+            </el-scrollbar>
+          </el-card>
+        </div>
       </el-main>
     </el-container>
   </div>
@@ -52,14 +52,31 @@ import router from '@/router'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/index'
 
+const username = ref('Tom')
+const history = ref([
+  'history1',
+  'history2',
+  'history3',
+  'history4',
+  'history5',
+  'history6',
+  'history7',
+  'history8',
+  'history9'
+])
 const userStore = useUserStore()
 
-const userInfo = ref({
-  username: 'John Doe',
-  email: 'john.doe@example.com',
-  phone: '123-456-7890',
-  address: '123 Main St, City, Country'
-})
+const jumpHome = () => {
+  router.push('/home')
+}
+
+const logout = () => {
+  router.push('/login')
+}
+
+const back = () => {
+  router.push('query')
+}
 
 const confirmLogout = () => {
   ElMessageBox.confirm('确定要退出登录吗？', '提示', {
@@ -74,16 +91,9 @@ const confirmLogout = () => {
     .catch(() => {})
 }
 
-const logout = () => {
-  router.push('/login')
-}
-
-const jumpHistory = () => {
-  router.push('/history')
-}
-
-const back = () => {
-  router.push('query')
+const handleHistoryClick = (item) => {
+  console.log('点击了历史记录:', item)
+  // 在这里添加你的点击历史记录后的逻辑
 }
 </script>
 
@@ -139,35 +149,38 @@ const back = () => {
   right: 20px;
 }
 
-.user-info-card {
+.history-container {
   margin-top: 20px;
+}
+
+.history-card {
   width: 50%;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
 }
 
-.user-info-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.user-icon {
-  font-size: 60px;
-  margin-right: 20px;
-}
-
-.user-info-details {
-  margin-left: 20px;
-}
-
-.user-name {
+.history-title {
   font-size: 24px;
   font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
 }
 
-.user-email {
-  font-size: 16px;
-  color: #888;
+.history-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.history-item {
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.history-item:hover {
+  background-color: #f5f5f5;
 }
 </style>
