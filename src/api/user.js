@@ -18,3 +18,6 @@ export const getEmailCodeInForgetPasswordService = (email) =>
 
 export const modifyPasswordService = (email, password, newEmailCode, lastEmailCode) =>
   request.post('/updatePassword', { email, password, newEmailCode, lastEmailCode })
+
+export const userLoginByEmailService = (email, password) =>
+  request.post('/loginByEmail', { email, password })

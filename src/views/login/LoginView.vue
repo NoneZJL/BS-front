@@ -1,10 +1,4 @@
 <template>
-  <div v-if="showSuccessMessage" class="success-message" :style="{ top: messageTop + 'px' }">
-    {{ successMessage }}
-  </div>
-  <div v-if="showFailMessage" class="fail-message" :style="{ top: messageTop + 'px' }">
-    {{ failMessage }}
-  </div>
   <div :class="['login-page', { 'move-up': moveUP }]">
     <div style="display: block">
       <img style="width: 30vh" src="../../assets/logo.png" alt="LOGO" />
@@ -26,22 +20,26 @@
         >
       </div>
     </Transition>
-    <Transition name="fade">
+    <Transition name="fade" mode="out-in">
       <div v-if="loginVisible" class="login">
-        <h1>登录</h1>
+        <h1>{{ loginByUsername ? '用户名登录' : '邮箱登录' }}</h1>
         <el-form :model="login" label-width="auto" style="max-width: 600px">
-          <el-form-item label="用户名">
+          <el-form-item :label="loginByUsername ? '用户名' : '邮箱'">
             <el-input
-              v-model="login.name"
-              placeholder="请输入用户名"
+              v-model="loginInputValue"
+              :placeholder="loginByUsername ? '请输入用户名' : '请输入邮箱'"
               style="width: 225px"
             ></el-input>
           </el-form-item>
           <el-form-item label="密码">
-            <el-input v-model="login.password" placeholder="请输入密码" show-password></el-input>
+            <el-input v-model="loginPasswordType" placeholder="请输入密码" show-password></el-input>
           </el-form-item>
           <el-button type="primary" round plain @click="clickReturn">返回</el-button>
-          <el-button type="primary" round plain @click="userLogin">登录</el-button>
+          <el-button type="primary" round plain @click="loginFunction">登录</el-button>
+          <br /><br />
+          <span class="forgot-password" @click="loginByUsername = !loginByUsername">{{
+            loginByUsername ? '切换为邮箱登录' : '切换为用户名登录'
+          }}</span>
           <br /><br />
           <span class="forgot-password" @click="handleForgotPassword">忘记密码？</span>
         </el-form>
@@ -100,12 +98,45 @@
 </template>
 
 <script setup>
-import { getEmailCodeService, userLoginService, userRegisterService } from '@/api/user'
+import {
+  getEmailCodeService,
+  userLoginByEmailService,
+  userLoginService,
+  userRegisterService
+} from '@/api/user'
 import router from '@/router/index'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useUserStore } from '@/stores/index'
 
 const userStore = useUserStore()
+
+const loginByUsername = ref(true)
+
+const loginInputValue = computed({
+  get() {
+    return loginByUsername.value ? login.value.name : loginByEmail.value.email
+  },
+  set(value) {
+    if (loginByUsername.value) {
+      login.value.name = value
+    } else {
+      loginByEmail.value.email = value
+    }
+  }
+})
+
+const loginPasswordType = computed({
+  get() {
+    return loginByUsername.value ? login.value.password : loginByEmail.value.password
+  },
+  set(value) {
+    if (loginByUsername.value) {
+      login.value.password = value
+    } else {
+      loginByEmail.value.password = value
+    }
+  }
+})
 
 const login = ref({
   name: '',
@@ -120,7 +151,13 @@ const register = ref({
   justifyCode: ''
 })
 
+const loginByEmail = ref({
+  email: '',
+  password: ''
+})
+
 const loginVisible = ref(false)
+const loginByEmailVisible = ref(false)
 const homeVisible = ref(true)
 const moveUP = ref(false)
 const registerVisible = ref(false)
@@ -165,6 +202,7 @@ const clickReturn = () => {
   moveUP.value = false
   loginVisible.value = false
   registerVisible.value = false
+  loginByEmailVisible.value = false
   setTimeout(() => {
     homeVisible.value = true
   }, 500) // 500毫秒后显示button
@@ -172,21 +210,11 @@ const clickReturn = () => {
 
 const verificationCountdown = ref(30)
 const countdownActive = ref(false)
-const showSuccessMessage = ref(false)
-const successMessage = ref('')
-const showFailMessage = ref(false)
-const failMessage = ref('')
-const messageTop = ref(20) // 自定义顶部位置
 
 const getVerificationCode = async () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(register.value.email)) {
-    failMessage.value = '邮箱格式不正确'
-    showFailMessage.value = true
-    setTimeout(() => {
-      showFailMessage.value = false
-      failMessage.value = ''
-    }, 3000)
+    ElMessage.error('邮箱格式不正确')
     return
   }
 
@@ -196,14 +224,7 @@ const getVerificationCode = async () => {
   if (countdownActive.value) return // 如果已经在倒计时，直接返回
   countdownActive.value = true // 开始倒计时
   // 设置提示信息
-  successMessage.value = '验证码已发送！'
-  showSuccessMessage.value = true
-
-  // 设置 3 秒后自动隐藏提示
-  setTimeout(() => {
-    showSuccessMessage.value = false
-    successMessage.value = ''
-  }, 3000)
+  ElMessage.success('验证码已发送！')
 
   const countdownInterval = setInterval(() => {
     verificationCountdown.value--
@@ -231,12 +252,7 @@ const submitRegister = () => {
         userStore.emailCode
       )
       if (res.data.code === 1) {
-        failMessage.value = res.data.err
-        showFailMessage.value = true
-        setTimeout(() => {
-          showFailMessage.value = false
-          failMessage.value = ''
-        }, 3000)
+        ElMessage.error(res.data.err)
         return
       }
       userStore.removeEmailCode()
@@ -245,11 +261,8 @@ const submitRegister = () => {
       register.value.repassword = ''
       register.value.email = ''
       register.value.justifyCode = ''
-      successMessage.value = '注册成功'
-      showSuccessMessage.value = true
+      ElMessage.success('注册成功')
       setTimeout(() => {
-        showSuccessMessage.value = false
-        successMessage.value = ''
         registerVisible.value = false
         loginVisible.value = true
       }, 1000)
@@ -263,24 +276,35 @@ const submitRegister = () => {
 const userLogin = async () => {
   const res = await userLoginService(login.value.name, login.value.password)
   if (res.data.code === 1) {
-    failMessage.value = res.data.err
-    showFailMessage.value = true
+    ElMessage.error(res.data.err)
     login.value.password = ''
-    setTimeout(() => {
-      showFailMessage.value = false
-      failMessage.value = ''
-    }, 2000)
     return
   }
-  successMessage.value = '登录成功'
-  showSuccessMessage.value = true
+  ElMessage.success('登录成功')
   userStore.setToken(res.data.payload)
   userStore.setUsername(login.value.name)
-  setTimeout(() => {
-    showSuccessMessage.value = false
-    successMessage.value = ''
-  }, 500)
   router.push('/query')
+}
+
+const userLoginByEmail = async () => {
+  const res = await userLoginByEmailService(loginByEmail.value.email, loginByEmail.value.password)
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  console.log(res)
+  userStore.setToken(res.data.payload.token)
+  userStore.setUsername(res.data.payload.username)
+  ElMessage.success('登录成功')
+  router.push('/query')
+}
+
+const loginFunction = () => {
+  if (loginByUsername.value) {
+    userLogin()
+  } else {
+    userLoginByEmail()
+  }
 }
 
 const registerForm = ref(null)
@@ -396,7 +420,7 @@ const registerRules = {
 
 .login,
 .register {
-  margin-top: 4vh;
+  margin-top: 1vh;
   display: flex;
   flex-direction: column;
   /* justify-content: center; */
