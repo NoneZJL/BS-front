@@ -26,6 +26,10 @@ const router = createRouter({
     {
       path: '/history',
       component: () => import('@/views/home/HisrotyView.vue')
+    },
+    {
+      path: '/remainder',
+      component: () => import('@/views/home/ReducePriceView.vue')
     }
   ]
 })

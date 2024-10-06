@@ -16,7 +16,7 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="jumpHome">个人主页</el-dropdown-item>
-                <el-dropdown-item @click="jumpRemainder">降价提醒</el-dropdown-item>
+                <el-dropdown-item @click="jumpHistory">历史记录</el-dropdown-item>
                 <el-dropdown-item @click="confirmLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -26,23 +26,19 @@
       </el-header>
       <el-main>
         <el-button type="info" plain @click="back">返回</el-button>
-        <div class="history-container">
-          <el-card class="history-card">
-            <div class="history-title">历史记录</div>
-            <el-scrollbar height="400px">
-              <ul class="history-list">
-                <li
-                  v-for="(item, index) in history"
-                  :key="index"
-                  @click="handleHistoryClick(item)"
-                  class="history-item"
+        <el-row type="flex" justify="center" class="remainder-goods">
+          <el-col :span="12">
+            <span class="remainder-title">降价提醒</span>
+            <el-card v-for="good in remainderGoods" :key="good.id" class="good-item">
+              <div class="good-content">
+                <span>{{ good.name }}</span>
+                <el-button type="danger" plain @click="confirmCancelReminder(good.id)"
+                  >取消降价提醒</el-button
                 >
-                  {{ item }}
-                </li>
-              </ul>
-            </el-scrollbar>
-          </el-card>
-        </div>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
       </el-main>
     </el-container>
   </div>
@@ -50,42 +46,19 @@
 
 <script setup>
 import router from '@/router'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useUserStore } from '@/stores/index'
 
-const username = ref('Tom')
-const history = ref([
-  'history1',
-  'history2',
-  'history3',
-  'history4',
-  'history5',
-  'history6',
-  'history7',
-  'history8',
-  'history9'
-])
 const userStore = useUserStore()
+const username = ref(userStore.username)
 
-onMounted(() => {
-  username.value = userStore.username
-})
-
-const jumpHome = () => {
-  router.push('/home')
-}
-
-const logout = () => {
-  router.push('/login')
-}
-
-const back = () => {
-  router.push('query')
-}
-
-const jumpRemainder = () => {
-  router.push('/remainder')
-}
+const remainderGoods = ref([
+  { id: 1, name: 'good01' },
+  { id: 2, name: 'good02' },
+  { id: 3, name: 'good03' },
+  { id: 4, name: 'good04' },
+  { id: 5, name: 'good05' }
+])
 
 const confirmLogout = () => {
   ElMessageBox.confirm('确定要退出登录吗？', '提示', {
@@ -100,9 +73,39 @@ const confirmLogout = () => {
     .catch(() => {})
 }
 
-const handleHistoryClick = (item) => {
-  console.log('点击了历史记录:', item)
-  // 在这里添加你的点击历史记录后的逻辑
+const logout = () => {
+  router.push('/login')
+}
+
+const jumpHistory = () => {
+  router.push('/history')
+}
+
+const back = () => {
+  router.push('query')
+}
+
+const jumpHome = () => {
+  router.push('/home')
+}
+
+const confirmCancelReminder = (goodId) => {
+  ElMessageBox.confirm('确定要取消降价提醒吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => {
+      cancelReminder(goodId)
+    })
+    .catch(() => {})
+}
+
+const cancelReminder = (goodId) => {
+  // 在这里添加取消降价提醒的逻辑
+  console.log(`取消降价提醒的商品ID: ${goodId}`)
+  // 例如，你可以从 remainderGoods 中移除该商品
+  remainderGoods.value = remainderGoods.value.filter((good) => good.id !== goodId)
 }
 </script>
 
@@ -159,38 +162,32 @@ const handleHistoryClick = (item) => {
   right: 20px;
 }
 
-.history-container {
+.remainder-goods {
   margin-top: 20px;
+  text-align: center;
 }
 
-.history-card {
-  width: 50%;
-  margin: 0 auto;
-}
-
-.history-title {
+.remainder-title {
+  display: block;
   font-size: 24px;
   font-weight: bold;
-  color: #333;
   margin-bottom: 20px;
-  text-align: center;
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 10px;
+  color: #409eff;
 }
 
-.history-list {
-  list-style-type: none;
-  padding: 0;
+.good-item {
+  margin-bottom: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    0 0 6px rgba(0, 0, 0, 0.04);
 }
 
-.history-item {
+.good-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 10px;
-  border-bottom: 1px solid #e0e0e0;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.history-item:hover {
-  background-color: #f5f5f5;
 }
 </style>

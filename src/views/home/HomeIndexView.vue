@@ -16,6 +16,7 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="jumpHistory">历史记录</el-dropdown-item>
+                <el-dropdown-item @click="jumpRemainder">降价提醒</el-dropdown-item>
                 <el-dropdown-item @click="confirmLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -149,6 +150,10 @@ const jumpHistory = () => {
 
 const back = () => {
   router.push('query')
+}
+
+const jumpRemainder = () => {
+  router.push('/remainder')
 }
 
 const showEditForm = () => {

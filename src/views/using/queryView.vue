@@ -17,6 +17,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item @click="jumpHome">个人主页</el-dropdown-item>
                 <el-dropdown-item @click="jumpHistory">历史记录</el-dropdown-item>
+                <el-dropdown-item @click="jumpRemainder">降价提醒</el-dropdown-item>
                 <el-dropdown-item @click="confirmLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -56,9 +57,15 @@
                 <span style="margin-left: 5px">拼多多</span>
               </template>
             </el-tab-pane>
+            <el-tab-pane name="priceHistory">
+              <template #label>
+                <el-icon><Calendar /></el-icon>
+                <span style="margin-left: 5px">价格历史</span>
+              </template>
+            </el-tab-pane>
           </el-tabs>
         </div>
-        <div class="search-content">
+        <div class="search-content" v-if="activeWebsite !== 'priceHistory'">
           <el-row :gutter="20">
             <el-col
               :xs="24"
@@ -77,13 +84,13 @@
                     <span class="price">¥{{ item.price }}</span>
                     <el-button type="text" class="button">查看详情</el-button>
                   </div>
-                  <!-- <div class="content">
-                    <span>{{ item.content }}</span>
-                  </div> -->
                 </div>
               </el-card>
             </el-col>
           </el-row>
+        </div>
+        <div class="search-content" v-if="activeWebsite === 'priceHistory'">
+          <div id="priceHistoryChart" style="width: 100%; height: 400px"></div>
         </div>
       </el-main>
     </el-container>
@@ -91,12 +98,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import router from '@/router/index'
 import { useUserStore } from '@/stores/index'
+import * as echarts from 'echarts'
 
 const username = ref('username')
 const search = ref('')
+const lastSearch = ref('')
 const userStore = useUserStore()
 const activeWebsite = ref('jd')
 
@@ -172,6 +181,43 @@ const pddProducts = ref([
   { name: '拼多多8', price: 800, image: 'https://via.placeholder.com/150', content: '这是物品见解' }
 ])
 
+const priceHistoryOfJD = ref([
+  { name: 'good', date: '2024-7-1', price: '55.60' },
+  { name: 'good', date: '2024-7-2', price: '55.80' },
+  { name: 'good', date: '2024-7-3', price: '57.20' },
+  { name: 'good', date: '2024-7-4', price: '58.90' },
+  { name: 'good', date: '2024-7-5', price: '54.60' },
+  { name: 'good', date: '2024-7-6', price: '57.60' },
+  { name: 'good', date: '2024-7-7', price: '57.60' },
+  { name: 'good', date: '2024-7-8', price: '57.60' },
+  { name: 'good', date: '2024-7-9', price: '59.20' },
+  { name: 'good', date: '2024-7-10', price: '53.20' }
+])
+const priceHistoryOfTB = ref([
+  { name: 'good', date: '2024-7-1', price: '45.60' },
+  { name: 'good', date: '2024-7-2', price: '45.80' },
+  { name: 'good', date: '2024-7-3', price: '44.20' },
+  { name: 'good', date: '2024-7-4', price: '48.90' },
+  { name: 'good', date: '2024-7-5', price: '47.80' },
+  { name: 'good', date: '2024-7-6', price: '47.60' },
+  { name: 'good', date: '2024-7-7', price: '45.30' },
+  { name: 'good', date: '2024-7-8', price: '47.60' },
+  { name: 'good', date: '2024-7-9', price: '49.20' },
+  { name: 'good', date: '2024-7-10', price: '43.20' }
+])
+const priceHistoryOfPDD = ref([
+  { name: 'good', date: '2024-7-1', price: '39.60' },
+  { name: 'good', date: '2024-7-2', price: '39.80' },
+  { name: 'good', date: '2024-7-3', price: '39.20' },
+  { name: 'good', date: '2024-7-4', price: '39.90' },
+  { name: 'good', date: '2024-7-5', price: '39.60' },
+  { name: 'good', date: '2024-7-6', price: '39.60' },
+  { name: 'good', date: '2024-7-7', price: '39.60' },
+  { name: 'good', date: '2024-7-8', price: '39.60' },
+  { name: 'good', date: '2024-7-9', price: '39.20' },
+  { name: 'good', date: '2024-7-10', price: '40.20' }
+])
+
 const currentProducts = computed(() => {
   switch (activeWebsite.value) {
     case 'jd':
@@ -191,6 +237,10 @@ const jumpHome = () => {
 
 const jumpHistory = () => {
   router.push('/history')
+}
+
+const jumpRemainder = () => {
+  router.push('/remainder')
 }
 
 const confirmLogout = () => {
@@ -213,11 +263,65 @@ const logout = () => {
 
 const handleSearch = () => {
   console.log('搜索内容:', search.value)
+  lastSearch.value = search.value
   // 在这里添加你的搜索逻辑
 }
 
 const handleClick = (tab) => {
   console.log('切换后的 activeWebsite 值:', tab.props.name)
+  if (tab.props.name === 'priceHistory') {
+    nextTick(() => {
+      setTimeout(() => {
+        initChart()
+      }, 100)
+    })
+  }
+}
+
+const initChart = () => {
+  const chartDom = document.getElementById('priceHistoryChart')
+  if (!chartDom) return
+
+  const myChart = echarts.init(chartDom)
+
+  const option = {
+    title: {
+      text: '价格历史'
+    },
+    tooltip: {
+      trigger: 'axis'
+    },
+    legend: {
+      data: ['京东', '淘宝', '拼多多']
+    },
+    xAxis: {
+      type: 'category',
+      data: priceHistoryOfJD.value.map((item) => item.date)
+    },
+    yAxis: {
+      type: 'value',
+      name: '价格'
+    },
+    series: [
+      {
+        name: '京东',
+        type: 'line',
+        data: priceHistoryOfJD.value.map((item) => parseFloat(item.price))
+      },
+      {
+        name: '淘宝',
+        type: 'line',
+        data: priceHistoryOfTB.value.map((item) => parseFloat(item.price))
+      },
+      {
+        name: '拼多多',
+        type: 'line',
+        data: priceHistoryOfPDD.value.map((item) => parseFloat(item.price))
+      }
+    ]
+  }
+
+  myChart.setOption(option)
 }
 </script>
 
