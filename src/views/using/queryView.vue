@@ -290,6 +290,7 @@ const handleSearch = async () => {
     return
   }
   ElMessage.success('搜索成功')
+  nowSearching.value = trimmedSearch
   // 在这里添加你的搜索逻辑
 }
 
