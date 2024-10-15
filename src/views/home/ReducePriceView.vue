@@ -47,9 +47,10 @@
 <script setup>
 import router from '@/router'
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/index'
+import { useUserStore, useQueryStore } from '@/stores/index'
 
 const userStore = useUserStore()
+const queryStore = useQueryStore()
 const username = ref(userStore.username)
 
 const remainderGoods = ref([
@@ -68,6 +69,7 @@ const confirmLogout = () => {
   })
     .then(() => {
       userStore.removeToken()
+      queryStore.removeQueringName()
       logout()
     })
     .catch(() => {})

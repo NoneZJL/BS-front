@@ -37,6 +37,10 @@
             </el-input>
           </div>
         </div>
+        <div class="now-searching-container">
+          <span v-if="nowSearching">当前查询的内容为：{{ nowSearching }}</span>
+          <span v-else>当前暂未进行查询</span>
+        </div>
         <div class="search-website">
           <el-tabs v-model="activeWebsite" class="demo-tabs" @tab-click="handleClick">
             <el-tab-pane name="jd">
@@ -102,9 +106,11 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import router from '@/router/index'
 import { useUserStore, useQueryStore } from '@/stores/index'
 import * as echarts from 'echarts'
+import { queryGoodService } from '@/api/query'
 
 const username = ref('username')
 const search = ref('')
+const nowSearching = ref('')
 const userStore = useUserStore()
 const queryStore = useQueryStore()
 const activeWebsite = ref('jd')
@@ -112,7 +118,7 @@ const activeWebsite = ref('jd')
 onMounted(() => {
   username.value = userStore.username
   if (!queryStore.isQueryingNameEmpty()) {
-    search.value = queryStore.queryingName
+    nowSearching.value = queryStore.queryingName
   }
 })
 
@@ -255,6 +261,7 @@ const confirmLogout = () => {
     .then(() => {
       userStore.removeToken()
       userStore.removeUsername()
+      queryStore.removeQueringName()
       logout()
     })
     .catch(() => {})
@@ -264,9 +271,25 @@ const logout = () => {
   router.push('/login')
 }
 
-const handleSearch = () => {
-  console.log('搜索内容:', search.value)
-  queryStore.setQueryingName(search.value)
+const handleSearch = async () => {
+  // 去除输入内容两侧的空格
+  const trimmedSearch = search.value.trim()
+  // 判断输入内容是否为空
+  if (!trimmedSearch) {
+    ElMessage.error('搜索内容不能为空')
+    return
+  }
+  queryStore.setQueryingName(trimmedSearch)
+  const res = await queryGoodService(trimmedSearch)
+  if (res.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  ElMessage.success('搜索成功')
   // 在这里添加你的搜索逻辑
 }
 
@@ -329,6 +352,12 @@ const initChart = () => {
 </script>
 
 <style scoped>
+.now-searching-container {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
 .header {
   display: flex;
   justify-content: space-between;

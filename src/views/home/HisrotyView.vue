@@ -50,7 +50,7 @@
                   class="history-item"
                 >
                   {{ item }}
-                  <span @click.stop="deleteHistoryItem(index)" class="delete-text"> 删除 </span>
+                  <span @click.stop="deleteHistoryItem(item)" class="delete-text"> 删除 </span>
                 </li>
               </ul>
             </el-scrollbar>
@@ -65,24 +65,34 @@
 import router from '@/router'
 import { ref, onMounted } from 'vue'
 import { useUserStore, useQueryStore } from '@/stores/index'
+import {
+  getAllHistoryService,
+  deleteSingleHistoryByNameService,
+  deleteAllHistoryService
+} from '@/api/query'
 
 const username = ref('Tom')
-const history = ref([
-  'history1',
-  'history2',
-  'history3',
-  'history4',
-  'history5',
-  'history6',
-  'history7',
-  'history8',
-  'history9'
-])
+const history = ref([])
 const userStore = useUserStore()
 const queryStore = useQueryStore()
 
-onMounted(() => {
+const getHistory = async () => {
+  const res = await getAllHistoryService()
+  if (res.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  const queryHistory = res.data.payload
+  history.value = queryHistory.map((item) => item.content)
+}
+
+onMounted(async () => {
   username.value = userStore.username
+  getHistory()
 })
 
 const jumpHome = () => {
@@ -109,6 +119,7 @@ const confirmLogout = () => {
   })
     .then(() => {
       userStore.removeToken()
+      queryStore.removeQueringName()
       logout()
     })
     .catch(() => {})
@@ -121,8 +132,19 @@ const handleHistoryClick = (item) => {
   // 在这里添加你的点击历史记录后的逻辑
 }
 
-const deleteHistoryItem = (index) => {
-  history.value.splice(index, 1)
+const deleteHistoryItem = async (name) => {
+  console.log(name)
+  const res = await deleteSingleHistoryByNameService(name)
+  if (res.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  getHistory()
+  ElMessage.success('删除成功')
 }
 
 const confirmDeleteAll = () => {
@@ -131,8 +153,18 @@ const confirmDeleteAll = () => {
     cancelButtonText: '取消',
     type: 'warning'
   })
-    .then(() => {
-      history.value = []
+    .then(async () => {
+      const res = await deleteAllHistoryService()
+      if (res.data.code === 2) {
+        router.push('/login')
+        return
+      }
+      if (res.data.code === 1) {
+        ElMessage.error(res.data.err)
+        return
+      }
+      getHistory()
+      ElMessage.success('删除成功')
     })
     .catch(() => {})
 }
@@ -255,5 +287,11 @@ const confirmDeleteAll = () => {
 .delete-all-button {
   color: #f56c6c;
   margin-right: 10px;
+  border-color: #f56c6c;
+}
+
+.delete-all-button:hover {
+  background-color: #f56c6c;
+  color: white;
 }
 </style>

@@ -78,10 +78,11 @@
 <script setup>
 import router from '@/router'
 import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/stores/index'
+import { useUserStore, useQueryStore } from '@/stores/index'
 import { getUserInfoService, updateUserInfoService } from '@/api/user'
 
 const userStore = useUserStore()
+const queryStore = useQueryStore()
 
 const userInfo = ref({
   username: 'John Doe',
@@ -135,6 +136,7 @@ const confirmLogout = () => {
   })
     .then(() => {
       userStore.removeToken()
+      queryStore.removeQueringName()
       logout()
     })
     .catch(() => {})
