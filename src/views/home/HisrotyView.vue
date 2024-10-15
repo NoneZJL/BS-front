@@ -51,7 +51,7 @@
 <script setup>
 import router from '@/router'
 import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/stores/index'
+import { useUserStore, useQueryStore } from '@/stores/index'
 
 const username = ref('Tom')
 const history = ref([
@@ -66,6 +66,7 @@ const history = ref([
   'history9'
 ])
 const userStore = useUserStore()
+const queryStore = useQueryStore()
 
 onMounted(() => {
   username.value = userStore.username
@@ -102,6 +103,8 @@ const confirmLogout = () => {
 
 const handleHistoryClick = (item) => {
   console.log('点击了历史记录:', item)
+  queryStore.setQueryingName(item)
+  router.push('/query')
   // 在这里添加你的点击历史记录后的逻辑
 }
 </script>

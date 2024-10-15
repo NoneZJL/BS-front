@@ -100,17 +100,20 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import router from '@/router/index'
-import { useUserStore } from '@/stores/index'
+import { useUserStore, useQueryStore } from '@/stores/index'
 import * as echarts from 'echarts'
 
 const username = ref('username')
 const search = ref('')
-const lastSearch = ref('')
 const userStore = useUserStore()
+const queryStore = useQueryStore()
 const activeWebsite = ref('jd')
 
 onMounted(() => {
   username.value = userStore.username
+  if (!queryStore.isQueryingNameEmpty()) {
+    search.value = queryStore.queryingName
+  }
 })
 
 const jdProducts = ref([
@@ -263,7 +266,7 @@ const logout = () => {
 
 const handleSearch = () => {
   console.log('搜索内容:', search.value)
-  lastSearch.value = search.value
+  queryStore.setQueryingName(search.value)
   // 在这里添加你的搜索逻辑
 }
 
