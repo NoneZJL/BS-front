@@ -25,12 +25,24 @@
         </div>
       </el-header>
       <el-main>
-        <el-button type="info" plain @click="back">返回</el-button>
+        <div class="button-container">
+          <el-button type="info" plain @click="back">返回</el-button>
+          <el-button
+            v-if="history.length > 0"
+            type="danger"
+            plain
+            @click="confirmDeleteAll"
+            class="delete-all-button"
+          >
+            删除所有历史记录
+          </el-button>
+        </div>
         <div class="history-container">
           <el-card class="history-card">
             <div class="history-title">历史记录</div>
             <el-scrollbar height="400px">
               <ul class="history-list">
+                <li v-if="history.length === 0" class="no-history">暂无历史查询数据</li>
                 <li
                   v-for="(item, index) in history"
                   :key="index"
@@ -38,6 +50,7 @@
                   class="history-item"
                 >
                   {{ item }}
+                  <span @click.stop="deleteHistoryItem(index)" class="delete-text"> 删除 </span>
                 </li>
               </ul>
             </el-scrollbar>
@@ -107,6 +120,22 @@ const handleHistoryClick = (item) => {
   router.push('/query')
   // 在这里添加你的点击历史记录后的逻辑
 }
+
+const deleteHistoryItem = (index) => {
+  history.value.splice(index, 1)
+}
+
+const confirmDeleteAll = () => {
+  ElMessageBox.confirm('确定要删除所有历史记录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => {
+      history.value = []
+    })
+    .catch(() => {})
+}
 </script>
 
 <style scoped>
@@ -162,6 +191,13 @@ const handleHistoryClick = (item) => {
   right: 20px;
 }
 
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .history-container {
   margin-top: 20px;
 }
@@ -191,9 +227,33 @@ const handleHistoryClick = (item) => {
   border-bottom: 1px solid #e0e0e0;
   cursor: pointer;
   transition: background-color 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .history-item:hover {
   background-color: #f5f5f5;
+}
+
+.no-history {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+
+.delete-text {
+  color: #f56c6c;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.delete-text:hover {
+  color: #ff0000;
+}
+
+.delete-all-button {
+  color: #f56c6c;
+  margin-right: 10px;
 }
 </style>
