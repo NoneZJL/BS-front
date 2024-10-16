@@ -83,7 +83,7 @@
               <el-card :body-style="{ padding: '0px' }" class="product-card">
                 <img :src="item.img" class="image" />
                 <div style="padding: 14px">
-                  <span>{{ item.description }}</span>
+                  <span class="description">{{ item.description }}</span>
                   <div class="bottom">
                     <span class="price">¥{{ item.price }}</span>
                     <el-button type="text" class="button" @click="setRemainder(item.id)"
@@ -94,6 +94,7 @@
               </el-card>
             </el-col>
           </el-row>
+          <el-empty v-if="currentProducts.length === 0" description="无搜索结果" />
         </div>
         <div class="search-content" v-if="activeWebsite === 'priceHistory'">
           <div id="priceHistoryChart" style="width: 100%; height: 400px"></div>
@@ -118,49 +119,36 @@ const userStore = useUserStore()
 const queryStore = useQueryStore()
 const activeWebsite = ref('jd')
 
-onMounted(() => {
+onMounted(async () => {
   username.value = userStore.username
   if (!queryStore.isQueryingNameEmpty()) {
     nowSearching.value = queryStore.queryingName
+    const loading = ElLoading.service({
+      lock: true,
+      text: '搜索中',
+      background: 'rgba(0, 0, 0, 0.7)'
+    })
+    const answer = await jdGetGoodsBySearchingNameService(nowSearching.value)
+    if (answer.data.code === 2) {
+      router.push('/login')
+      return
+    }
+    if (answer.data.code === 1) {
+      ElMessage.error(answer.data.err)
+      return
+    }
+    const goodList = answer.data.payload
+    console.log(goodList)
+    jdProducts.value = goodList.map((item) => item)
+    loading.close()
   }
 })
 
-const jdProducts = ref([
-  {
-    id: 1,
-    description: '京东1',
-    price: 100,
-    img: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 2,
-    description: '京东2',
-    price: 200,
-    img: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  }
-])
+const jdProducts = ref([])
 
-const tbProducts = ref([
-  {
-    id: 11,
-    description: '淘宝1',
-    price: 100,
-    img: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  }
-])
+const tbProducts = ref([])
 
-const pddProducts = ref([
-  {
-    id: 21,
-    description: '拼多多1',
-    price: 100,
-    img: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  }
-])
+const pddProducts = ref([])
 
 const priceHistoryOfJD = ref([
   { name: 'good', date: '2024-7-1', price: '55.60' },
@@ -249,6 +237,11 @@ const handleSearch = async () => {
     return
   }
   queryStore.setQueryingName(trimmedSearch)
+  const loading = ElLoading.service({
+    lock: true,
+    text: '搜索中',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
   const res = await queryGoodService(trimmedSearch)
   if (res.data.code === 2) {
     router.push('/login')
@@ -266,12 +259,13 @@ const handleSearch = async () => {
     return
   }
   if (answer.data.code === 1) {
-    ElMessage.error(res.data.err)
+    ElMessage.error(answer.data.err)
     return
   }
   const goodList = answer.data.payload
   console.log(goodList)
   jdProducts.value = goodList.map((item) => item)
+  loading.close()
   // 在这里添加你的搜索逻辑
 }
 
@@ -460,5 +454,18 @@ const initChart = () => {
   margin-top: 10px;
   font-size: 14px;
   color: #606266;
+}
+
+.description {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #606266;
+  flex-grow: 1; /* 让内容区域占据剩余空间 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 显示省略号 */
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* 最多显示3行 */
+  -webkit-box-orient: vertical;
+  height: 60px; /* 设置固定高度 */
 }
 </style>
