@@ -138,48 +138,6 @@ const jdProducts = ref([
     price: 200,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
-  },
-  {
-    id: 3,
-    name: '京东3',
-    price: 300,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 4,
-    name: '京东4',
-    price: 400,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 5,
-    name: '京东5',
-    price: 500,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 6,
-    name: '京东6',
-    price: 600,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 7,
-    name: '京东7',
-    price: 700,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 8,
-    name: '京东8',
-    price: 800,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
   }
 ])
 
@@ -188,55 +146,6 @@ const tbProducts = ref([
     id: 11,
     name: '淘宝1',
     price: 100,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 12,
-    name: '淘宝2',
-    price: 200,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 13,
-    name: '淘宝3',
-    price: 300,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 14,
-    name: '淘宝4',
-    price: 400,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 15,
-    name: '淘宝5',
-    price: 500,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 16,
-    name: '淘宝6',
-    price: 600,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 17,
-    name: '淘宝7',
-    price: 700,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 18,
-    name: '淘宝8',
-    price: 800,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   }
@@ -249,55 +158,6 @@ const pddProducts = ref([
     price: 100,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
-  },
-  {
-    id: 22,
-    name: '拼多多2',
-    price: 200,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 23,
-    name: '拼多多3',
-    price: 300,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 24,
-    name: '拼多多4',
-    price: 400,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 25,
-    name: '拼多多5',
-    price: 500,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 26,
-    name: '拼多多6',
-    price: 600,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 27,
-    name: '拼多多7',
-    price: 700,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
-  },
-  {
-    id: 28,
-    name: '拼多多8',
-    price: 800,
-    image: 'https://via.placeholder.com/150',
-    content: '这是物品见解'
   }
 ])
 
@@ -306,36 +166,21 @@ const priceHistoryOfJD = ref([
   { name: 'good', date: '2024-7-2', price: '55.80' },
   { name: 'good', date: '2024-7-3', price: '57.20' },
   { name: 'good', date: '2024-7-4', price: '58.90' },
-  { name: 'good', date: '2024-7-5', price: '54.60' },
-  { name: 'good', date: '2024-7-6', price: '57.60' },
-  { name: 'good', date: '2024-7-7', price: '57.60' },
-  { name: 'good', date: '2024-7-8', price: '57.60' },
-  { name: 'good', date: '2024-7-9', price: '59.20' },
-  { name: 'good', date: '2024-7-10', price: '53.20' }
+  { name: 'good', date: '2024-7-5', price: '54.60' }
 ])
 const priceHistoryOfTB = ref([
   { name: 'good', date: '2024-7-1', price: '45.60' },
   { name: 'good', date: '2024-7-2', price: '45.80' },
   { name: 'good', date: '2024-7-3', price: '44.20' },
   { name: 'good', date: '2024-7-4', price: '48.90' },
-  { name: 'good', date: '2024-7-5', price: '47.80' },
-  { name: 'good', date: '2024-7-6', price: '47.60' },
-  { name: 'good', date: '2024-7-7', price: '45.30' },
-  { name: 'good', date: '2024-7-8', price: '47.60' },
-  { name: 'good', date: '2024-7-9', price: '49.20' },
-  { name: 'good', date: '2024-7-10', price: '43.20' }
+  { name: 'good', date: '2024-7-5', price: '47.80' }
 ])
 const priceHistoryOfPDD = ref([
   { name: 'good', date: '2024-7-1', price: '39.60' },
   { name: 'good', date: '2024-7-2', price: '39.80' },
   { name: 'good', date: '2024-7-3', price: '39.20' },
   { name: 'good', date: '2024-7-4', price: '39.90' },
-  { name: 'good', date: '2024-7-5', price: '39.60' },
-  { name: 'good', date: '2024-7-6', price: '39.60' },
-  { name: 'good', date: '2024-7-7', price: '39.60' },
-  { name: 'good', date: '2024-7-8', price: '39.60' },
-  { name: 'good', date: '2024-7-9', price: '39.20' },
-  { name: 'good', date: '2024-7-10', price: '40.20' }
+  { name: 'good', date: '2024-7-5', price: '39.60' }
 ])
 
 const currentProducts = computed(() => {
