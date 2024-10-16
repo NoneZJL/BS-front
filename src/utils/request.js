@@ -6,7 +6,7 @@ const baseURL = 'http://localhost:8082'
 const instance = axios.create({
   // TODO 1. 基础地址，超时时间
   baseURL,
-  timeout: 10000
+  timeout: 20000
 })
 
 instance.interceptors.request.use(
