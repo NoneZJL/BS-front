@@ -81,9 +81,9 @@
               :key="index"
             >
               <el-card :body-style="{ padding: '0px' }" class="product-card">
-                <img :src="item.image" class="image" />
+                <img :src="item.img" class="image" />
                 <div style="padding: 14px">
-                  <span>{{ item.name }}</span>
+                  <span>{{ item.description }}</span>
                   <div class="bottom">
                     <span class="price">¥{{ item.price }}</span>
                     <el-button type="text" class="button" @click="setRemainder(item.id)"
@@ -109,6 +109,7 @@ import router from '@/router/index'
 import { useUserStore, useQueryStore } from '@/stores/index'
 import * as echarts from 'echarts'
 import { queryGoodService } from '@/api/query'
+import { jdGetGoodsBySearchingNameService } from '@/api/jd'
 
 const username = ref('username')
 const search = ref('')
@@ -127,16 +128,16 @@ onMounted(() => {
 const jdProducts = ref([
   {
     id: 1,
-    name: '京东1',
+    description: '京东1',
     price: 100,
-    image: 'https://via.placeholder.com/150',
+    img: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   },
   {
     id: 2,
-    name: '京东2',
+    description: '京东2',
     price: 200,
-    image: 'https://via.placeholder.com/150',
+    img: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   }
 ])
@@ -144,9 +145,9 @@ const jdProducts = ref([
 const tbProducts = ref([
   {
     id: 11,
-    name: '淘宝1',
+    description: '淘宝1',
     price: 100,
-    image: 'https://via.placeholder.com/150',
+    img: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   }
 ])
@@ -154,9 +155,9 @@ const tbProducts = ref([
 const pddProducts = ref([
   {
     id: 21,
-    name: '拼多多1',
+    description: '拼多多1',
     price: 100,
-    image: 'https://via.placeholder.com/150',
+    img: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   }
 ])
@@ -257,8 +258,20 @@ const handleSearch = async () => {
     ElMessage.error(res.data.err)
     return
   }
-  ElMessage.success('搜索成功')
   nowSearching.value = trimmedSearch
+
+  const answer = await jdGetGoodsBySearchingNameService(trimmedSearch)
+  if (answer.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (answer.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  const goodList = answer.data.payload
+  console.log(goodList)
+  jdProducts.value = goodList.map((item) => item)
   // 在这里添加你的搜索逻辑
 }
 
