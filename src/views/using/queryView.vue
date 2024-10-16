@@ -55,10 +55,10 @@
                 <span style="margin-left: 5px">淘宝</span>
               </template>
             </el-tab-pane>
-            <el-tab-pane name="pdd">
+            <el-tab-pane name="sn">
               <template #label>
                 <el-icon><Shop /></el-icon>
-                <span style="margin-left: 5px">拼多多</span>
+                <span style="margin-left: 5px">苏宁</span>
               </template>
             </el-tab-pane>
             <el-tab-pane name="priceHistory">
@@ -111,6 +111,7 @@ import { useUserStore, useQueryStore } from '@/stores/index'
 import * as echarts from 'echarts'
 import { queryGoodService } from '@/api/query'
 import { jdGetGoodsBySearchingNameService } from '@/api/jd'
+import { snGetGoodsBySearchingNameService } from '@/api/sn'
 
 const username = ref('username')
 const search = ref('')
@@ -128,19 +129,34 @@ onMounted(async () => {
       text: '搜索中',
       background: 'rgba(0, 0, 0, 0.7)'
     })
-    const answer = await jdGetGoodsBySearchingNameService(nowSearching.value)
-    if (answer.data.code === 2) {
+    // JD
+    const JDanswer = await jdGetGoodsBySearchingNameService(nowSearching.value)
+    if (JDanswer.data.code === 2) {
       router.push('/login')
       return
     }
-    if (answer.data.code === 1) {
-      ElMessage.error(answer.data.err)
+    if (JDanswer.data.code === 1) {
+      ElMessage.error(JDanswer.data.err)
       return
     }
-    const goodList = answer.data.payload
-    console.log(goodList)
-    jdProducts.value = goodList.map((item) => item)
+    const JDgoodList = JDanswer.data.payload
+    console.log(JDgoodList)
+    jdProducts.value = JDgoodList.map((item) => item)
     loading.close()
+    // SN
+    const SNanswer = await snGetGoodsBySearchingNameService(nowSearching.value)
+    if (SNanswer.data.code === 2) {
+      router.push('/login')
+      return
+    }
+    if (SNanswer.data.code === 1) {
+      ElMessage.error(JDanswer.data.err)
+      return
+    }
+    const SNgoodList = SNanswer.data.payload
+    console.log(SNgoodList)
+    snProducts.value = SNgoodList.map((item) => item)
+    // TB
   }
 })
 
@@ -148,7 +164,7 @@ const jdProducts = ref([])
 
 const tbProducts = ref([])
 
-const pddProducts = ref([])
+const snProducts = ref([])
 
 const priceHistoryOfJD = ref([
   { name: 'good', date: '2024-7-1', price: '55.60' },
@@ -164,7 +180,7 @@ const priceHistoryOfTB = ref([
   { name: 'good', date: '2024-7-4', price: '48.90' },
   { name: 'good', date: '2024-7-5', price: '47.80' }
 ])
-const priceHistoryOfPDD = ref([
+const priceHistoryOfSN = ref([
   { name: 'good', date: '2024-7-1', price: '39.60' },
   { name: 'good', date: '2024-7-2', price: '39.80' },
   { name: 'good', date: '2024-7-3', price: '39.20' },
@@ -178,8 +194,8 @@ const currentProducts = computed(() => {
       return jdProducts.value
     case 'tb':
       return tbProducts.value
-    case 'pdd':
-      return pddProducts.value
+    case 'sn':
+      return snProducts.value
     default:
       return []
   }
@@ -253,19 +269,33 @@ const handleSearch = async () => {
   }
   nowSearching.value = trimmedSearch
 
-  const answer = await jdGetGoodsBySearchingNameService(trimmedSearch)
-  if (answer.data.code === 2) {
+  // JD
+  const JDanswer = await jdGetGoodsBySearchingNameService(nowSearching.value)
+  if (JDanswer.data.code === 2) {
     router.push('/login')
     return
   }
-  if (answer.data.code === 1) {
-    ElMessage.error(answer.data.err)
+  if (JDanswer.data.code === 1) {
+    ElMessage.error(JDanswer.data.err)
     return
   }
-  const goodList = answer.data.payload
-  console.log(goodList)
-  jdProducts.value = goodList.map((item) => item)
+  const JDgoodList = JDanswer.data.payload
+  jdProducts.value = JDgoodList.map((item) => item)
   loading.close()
+  // SN
+  const SNanswer = await snGetGoodsBySearchingNameService(nowSearching.value)
+  if (SNanswer.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (SNanswer.data.code === 1) {
+    ElMessage.error(JDanswer.data.err)
+    return
+  }
+  const SNgoodList = SNanswer.data.payload
+  snProducts.value = SNgoodList.map((item) => item)
+  // TB
+
   // 在这里添加你的搜索逻辑
 }
 
@@ -294,7 +324,7 @@ const initChart = () => {
       trigger: 'axis'
     },
     legend: {
-      data: ['京东', '淘宝', '拼多多']
+      data: ['京东', '淘宝', '苏宁']
     },
     xAxis: {
       type: 'category',
@@ -316,9 +346,9 @@ const initChart = () => {
         data: priceHistoryOfTB.value.map((item) => parseFloat(item.price))
       },
       {
-        name: '拼多多',
+        name: '苏宁',
         type: 'line',
-        data: priceHistoryOfPDD.value.map((item) => parseFloat(item.price))
+        data: priceHistoryOfSN.value.map((item) => parseFloat(item.price))
       }
     ]
   }
