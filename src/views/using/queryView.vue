@@ -86,7 +86,9 @@
                   <span>{{ item.name }}</span>
                   <div class="bottom">
                     <span class="price">¥{{ item.price }}</span>
-                    <el-button type="text" class="button">查看详情</el-button>
+                    <el-button type="text" class="button" @click="setRemainder(item.id)"
+                      >设置降价提醒</el-button
+                    >
                   </div>
                 </div>
               </el-card>
@@ -123,71 +125,180 @@ onMounted(() => {
 })
 
 const jdProducts = ref([
-  { name: '京东1', price: 100, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '京东2', price: 200, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '京东3', price: 300, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '京东4', price: 400, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '京东5', price: 500, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '京东6', price: 600, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '京东7', price: 700, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '京东8', price: 800, image: 'https://via.placeholder.com/150', content: '这是物品见解' }
+  {
+    id: 1,
+    name: '京东1',
+    price: 100,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 2,
+    name: '京东2',
+    price: 200,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 3,
+    name: '京东3',
+    price: 300,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 4,
+    name: '京东4',
+    price: 400,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 5,
+    name: '京东5',
+    price: 500,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 6,
+    name: '京东6',
+    price: 600,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 7,
+    name: '京东7',
+    price: 700,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 8,
+    name: '京东8',
+    price: 800,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  }
 ])
 
 const tbProducts = ref([
-  { name: '淘宝1', price: 100, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '淘宝2', price: 200, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '淘宝3', price: 300, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '淘宝4', price: 400, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '淘宝5', price: 500, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '淘宝6', price: 600, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '淘宝7', price: 700, image: 'https://via.placeholder.com/150', content: '这是物品见解' },
-  { name: '淘宝8', price: 800, image: 'https://via.placeholder.com/150', content: '这是物品见解' }
+  {
+    id: 11,
+    name: '淘宝1',
+    price: 100,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 12,
+    name: '淘宝2',
+    price: 200,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 13,
+    name: '淘宝3',
+    price: 300,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 14,
+    name: '淘宝4',
+    price: 400,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 15,
+    name: '淘宝5',
+    price: 500,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 16,
+    name: '淘宝6',
+    price: 600,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 17,
+    name: '淘宝7',
+    price: 700,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  },
+  {
+    id: 18,
+    name: '淘宝8',
+    price: 800,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  }
 ])
 
 const pddProducts = ref([
   {
+    id: 21,
     name: '拼多多1',
     price: 100,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   },
   {
+    id: 22,
     name: '拼多多2',
     price: 200,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   },
   {
+    id: 23,
     name: '拼多多3',
     price: 300,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   },
   {
+    id: 24,
     name: '拼多多4',
     price: 400,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   },
   {
+    id: 25,
     name: '拼多多5',
     price: 500,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   },
   {
+    id: 26,
     name: '拼多多6',
     price: 600,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   },
   {
+    id: 27,
     name: '拼多多7',
     price: 700,
     image: 'https://via.placeholder.com/150',
     content: '这是物品见解'
   },
-  { name: '拼多多8', price: 800, image: 'https://via.placeholder.com/150', content: '这是物品见解' }
+  {
+    id: 28,
+    name: '拼多多8',
+    price: 800,
+    image: 'https://via.placeholder.com/150',
+    content: '这是物品见解'
+  }
 ])
 
 const priceHistoryOfJD = ref([
@@ -263,6 +374,18 @@ const confirmLogout = () => {
       userStore.removeUsername()
       queryStore.removeQueringName()
       logout()
+    })
+    .catch(() => {})
+}
+
+const setRemainder = (id) => {
+  ElMessageBox.confirm('确定要设置降价提醒吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => {
+      console.log(id)
     })
     .catch(() => {})
 }
