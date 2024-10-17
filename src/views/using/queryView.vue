@@ -80,7 +80,11 @@
               v-for="(item, index) in currentProducts"
               :key="index"
             >
-              <el-card :body-style="{ padding: '0px' }" class="product-card">
+              <el-card
+                :body-style="{ padding: '0px' }"
+                class="product-card"
+                @click="jumpUrl(item.detailUrl)"
+              >
                 <img :src="item.img" class="image" />
                 <div style="padding: 14px">
                   <span class="description">{{ item.description }}</span>
@@ -224,6 +228,11 @@ const jumpHistory = () => {
 
 const jumpRemainder = () => {
   router.push('/remainder')
+}
+
+const jumpUrl = (url) => {
+  console.log(url)
+  window.open(url, '_blank')
 }
 
 const confirmLogout = () => {
