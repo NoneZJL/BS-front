@@ -49,10 +49,10 @@
                 <span style="margin-left: 5px">京东</span>
               </template>
             </el-tab-pane>
-            <el-tab-pane name="tb">
+            <el-tab-pane name="wph">
               <template #label>
                 <el-icon><Shop /></el-icon>
-                <span style="margin-left: 5px">淘宝</span>
+                <span style="margin-left: 5px">唯品会</span>
               </template>
             </el-tab-pane>
             <el-tab-pane name="sn">
@@ -112,6 +112,7 @@ import * as echarts from 'echarts'
 import { queryGoodService } from '@/api/query'
 import { jdGetGoodsBySearchingNameService } from '@/api/jd'
 import { snGetGoodsBySearchingNameService } from '@/api/sn'
+import { wphGetGoodsBySearchingNameService } from '@/api/wph'
 
 const username = ref('username')
 const search = ref('')
@@ -150,19 +151,31 @@ onMounted(async () => {
       return
     }
     if (SNanswer.data.code === 1) {
-      ElMessage.error(JDanswer.data.err)
+      ElMessage.error(SNanswer.data.err)
       return
     }
     const SNgoodList = SNanswer.data.payload
     console.log(SNgoodList)
     snProducts.value = SNgoodList.map((item) => item)
-    // TB
+    // WPH
+    const WPHanswer = await wphGetGoodsBySearchingNameService(nowSearching.value)
+    if (WPHanswer.data.code === 2) {
+      router.push('/login')
+      return
+    }
+    if (WPHanswer.data.code === 1) {
+      ElMessage.error(WPHanswer.data.err)
+      return
+    }
+    const WPHgoodList = WPHanswer.data.payload
+    console.log(WPHgoodList)
+    wphProducts.value = WPHgoodList.map((item) => item)
   }
 })
 
 const jdProducts = ref([])
 
-const tbProducts = ref([])
+const wphProducts = ref([])
 
 const snProducts = ref([])
 
@@ -173,7 +186,7 @@ const priceHistoryOfJD = ref([
   { name: 'good', date: '2024-7-4', price: '58.90' },
   { name: 'good', date: '2024-7-5', price: '54.60' }
 ])
-const priceHistoryOfTB = ref([
+const priceHistoryOfWPH = ref([
   { name: 'good', date: '2024-7-1', price: '45.60' },
   { name: 'good', date: '2024-7-2', price: '45.80' },
   { name: 'good', date: '2024-7-3', price: '44.20' },
@@ -192,8 +205,8 @@ const currentProducts = computed(() => {
   switch (activeWebsite.value) {
     case 'jd':
       return jdProducts.value
-    case 'tb':
-      return tbProducts.value
+    case 'wph':
+      return wphProducts.value
     case 'sn':
       return snProducts.value
     default:
@@ -289,13 +302,24 @@ const handleSearch = async () => {
     return
   }
   if (SNanswer.data.code === 1) {
-    ElMessage.error(JDanswer.data.err)
+    ElMessage.error(SNanswer.data.err)
     return
   }
   const SNgoodList = SNanswer.data.payload
   snProducts.value = SNgoodList.map((item) => item)
-  // TB
-
+  // WPH
+  const WPHanswer = await wphGetGoodsBySearchingNameService(nowSearching.value)
+  if (WPHanswer.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (WPHanswer.data.code === 1) {
+    ElMessage.error(WPHanswer.data.err)
+    return
+  }
+  const WPHgoodList = WPHanswer.data.payload
+  console.log(WPHgoodList)
+  wphProducts.value = WPHgoodList.map((item) => item)
   // 在这里添加你的搜索逻辑
 }
 
@@ -324,7 +348,7 @@ const initChart = () => {
       trigger: 'axis'
     },
     legend: {
-      data: ['京东', '淘宝', '苏宁']
+      data: ['京东', '唯品会', '苏宁']
     },
     xAxis: {
       type: 'category',
@@ -341,9 +365,9 @@ const initChart = () => {
         data: priceHistoryOfJD.value.map((item) => parseFloat(item.price))
       },
       {
-        name: '淘宝',
+        name: '唯品会',
         type: 'line',
-        data: priceHistoryOfTB.value.map((item) => parseFloat(item.price))
+        data: priceHistoryOfWPH.value.map((item) => parseFloat(item.price))
       },
       {
         name: '苏宁',
