@@ -80,12 +80,8 @@
               v-for="(item, index) in currentProducts"
               :key="index"
             >
-              <el-card
-                :body-style="{ padding: '0px' }"
-                class="product-card"
-                @click="jumpUrl(item.detailUrl)"
-              >
-                <img :src="item.img" class="image" />
+              <el-card :body-style="{ padding: '0px' }" class="product-card">
+                <img :src="item.img" class="image" @click="jumpUrl(item.detailUrl)" />
                 <div style="padding: 14px">
                   <span class="description">{{ item.description }}</span>
                   <div class="bottom">
@@ -145,7 +141,6 @@ onMounted(async () => {
       return
     }
     const JDgoodList = JDanswer.data.payload
-    console.log(JDgoodList)
     jdProducts.value = JDgoodList.map((item) => item)
     loading.close()
     // SN
@@ -159,7 +154,6 @@ onMounted(async () => {
       return
     }
     const SNgoodList = SNanswer.data.payload
-    console.log(SNgoodList)
     snProducts.value = SNgoodList.map((item) => item)
     // WPH
     const WPHanswer = await wphGetGoodsBySearchingNameService(nowSearching.value)
@@ -172,7 +166,6 @@ onMounted(async () => {
       return
     }
     const WPHgoodList = WPHanswer.data.payload
-    console.log(WPHgoodList)
     wphProducts.value = WPHgoodList.map((item) => item)
   }
 })
@@ -231,7 +224,6 @@ const jumpRemainder = () => {
 }
 
 const jumpUrl = (url) => {
-  console.log(url)
   window.open(url, '_blank')
 }
 
@@ -327,13 +319,11 @@ const handleSearch = async () => {
     return
   }
   const WPHgoodList = WPHanswer.data.payload
-  console.log(WPHgoodList)
   wphProducts.value = WPHgoodList.map((item) => item)
   // 在这里添加你的搜索逻辑
 }
 
 const handleClick = (tab) => {
-  console.log('切换后的 activeWebsite 值:', tab.props.name)
   if (tab.props.name === 'priceHistory') {
     nextTick(() => {
       setTimeout(() => {
