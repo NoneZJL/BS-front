@@ -28,12 +28,12 @@
         <el-button type="info" plain @click="back">返回</el-button>
         <el-row type="flex" justify="center" class="remainder-goods">
           <el-col :span="12">
-            <span class="remainder-title">降价提醒</span>
+            <span class="remainder-title">我的收藏</span>
             <el-card v-for="good in remainderGoods" :key="good.id" class="good-item">
               <div class="good-content">
                 <span>{{ good.name }}</span>
                 <el-button type="danger" plain @click="confirmCancelReminder(good.id)"
-                  >取消降价提醒</el-button
+                  >取消收藏</el-button
                 >
               </div>
             </el-card>
@@ -92,7 +92,7 @@ const jumpHome = () => {
 }
 
 const confirmCancelReminder = (goodId) => {
-  ElMessageBox.confirm('确定要取消降价提醒吗？', '提示', {
+  ElMessageBox.confirm('确定要取消收藏吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'

@@ -61,12 +61,6 @@
                 <span style="margin-left: 5px">苏宁</span>
               </template>
             </el-tab-pane>
-            <el-tab-pane name="priceHistory">
-              <template #label>
-                <el-icon><Calendar /></el-icon>
-                <span style="margin-left: 5px">价格历史</span>
-              </template>
-            </el-tab-pane>
           </el-tabs>
         </div>
         <div class="search-content" v-if="activeWebsite !== 'priceHistory'">
@@ -86,6 +80,12 @@
                   <span class="description">{{ item.description }}</span>
                   <div class="bottom">
                     <span class="price">¥{{ item.price }}</span>
+                    <el-button
+                      type="text"
+                      class="button"
+                      @click="jumpDetail(item.detailUrl, item.description, item.img, item.price)"
+                      >商品详情</el-button
+                    >
                     <el-button type="text" class="button" @click="setRemainder(item.id)"
                       >添加到收藏</el-button
                     >
@@ -96,19 +96,15 @@
           </el-row>
           <el-empty v-if="currentProducts.length === 0" description="无搜索结果" />
         </div>
-        <div class="search-content" v-if="activeWebsite === 'priceHistory'">
-          <div id="priceHistoryChart" style="width: 100%; height: 400px"></div>
-        </div>
       </el-main>
     </el-container>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import router from '@/router/index'
-import { useUserStore, useQueryStore } from '@/stores/index'
-import * as echarts from 'echarts'
+import { useUserStore, useQueryStore, useDetailStore } from '@/stores/index'
 import { queryGoodService } from '@/api/query'
 import { jdGetGoodsBySearchingNameService } from '@/api/jd'
 import { snGetGoodsBySearchingNameService } from '@/api/sn'
@@ -119,6 +115,7 @@ const search = ref('')
 const nowSearching = ref('')
 const userStore = useUserStore()
 const queryStore = useQueryStore()
+const detailStore = useDetailStore()
 const activeWebsite = ref('jd')
 
 onMounted(async () => {
@@ -142,7 +139,7 @@ onMounted(async () => {
     }
     const JDgoodList = JDanswer.data.payload
     jdProducts.value = JDgoodList.map((item) => item)
-    loading.close()
+    // loading.close()
     // SN
     const SNanswer = await snGetGoodsBySearchingNameService(nowSearching.value)
     if (SNanswer.data.code === 2) {
@@ -167,36 +164,13 @@ onMounted(async () => {
     }
     const WPHgoodList = WPHanswer.data.payload
     wphProducts.value = WPHgoodList.map((item) => item)
+    loading.close()
   }
 })
 
 const jdProducts = ref([])
-
 const wphProducts = ref([])
-
 const snProducts = ref([])
-
-const priceHistoryOfJD = ref([
-  { name: 'good', date: '2024-7-1', price: '55.60' },
-  { name: 'good', date: '2024-7-2', price: '55.80' },
-  { name: 'good', date: '2024-7-3', price: '57.20' },
-  { name: 'good', date: '2024-7-4', price: '58.90' },
-  { name: 'good', date: '2024-7-5', price: '54.60' }
-])
-const priceHistoryOfWPH = ref([
-  { name: 'good', date: '2024-7-1', price: '45.60' },
-  { name: 'good', date: '2024-7-2', price: '45.80' },
-  { name: 'good', date: '2024-7-3', price: '44.20' },
-  { name: 'good', date: '2024-7-4', price: '48.90' },
-  { name: 'good', date: '2024-7-5', price: '47.80' }
-])
-const priceHistoryOfSN = ref([
-  { name: 'good', date: '2024-7-1', price: '39.60' },
-  { name: 'good', date: '2024-7-2', price: '39.80' },
-  { name: 'good', date: '2024-7-3', price: '39.20' },
-  { name: 'good', date: '2024-7-4', price: '39.90' },
-  { name: 'good', date: '2024-7-5', price: '39.60' }
-])
 
 const currentProducts = computed(() => {
   switch (activeWebsite.value) {
@@ -243,7 +217,7 @@ const confirmLogout = () => {
 }
 
 const setRemainder = (id) => {
-  ElMessageBox.confirm('确定要设置降价提醒吗？', '提示', {
+  ElMessageBox.confirm('确定要添加到收藏吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
@@ -295,7 +269,7 @@ const handleSearch = async () => {
   }
   const JDgoodList = JDanswer.data.payload
   jdProducts.value = JDgoodList.map((item) => item)
-  loading.close()
+  // loading.close()
   // SN
   const SNanswer = await snGetGoodsBySearchingNameService(nowSearching.value)
   if (SNanswer.data.code === 2) {
@@ -320,63 +294,17 @@ const handleSearch = async () => {
   }
   const WPHgoodList = WPHanswer.data.payload
   wphProducts.value = WPHgoodList.map((item) => item)
+  loading.close()
   // 在这里添加你的搜索逻辑
 }
 
-const handleClick = (tab) => {
-  if (tab.props.name === 'priceHistory') {
-    nextTick(() => {
-      setTimeout(() => {
-        initChart()
-      }, 100)
-    })
-  }
-}
-
-const initChart = () => {
-  const chartDom = document.getElementById('priceHistoryChart')
-  if (!chartDom) return
-
-  const myChart = echarts.init(chartDom)
-
-  const option = {
-    title: {
-      text: '价格历史'
-    },
-    tooltip: {
-      trigger: 'axis'
-    },
-    legend: {
-      data: ['京东', '唯品会', '苏宁']
-    },
-    xAxis: {
-      type: 'category',
-      data: priceHistoryOfJD.value.map((item) => item.date)
-    },
-    yAxis: {
-      type: 'value',
-      name: '价格'
-    },
-    series: [
-      {
-        name: '京东',
-        type: 'line',
-        data: priceHistoryOfJD.value.map((item) => parseFloat(item.price))
-      },
-      {
-        name: '唯品会',
-        type: 'line',
-        data: priceHistoryOfWPH.value.map((item) => parseFloat(item.price))
-      },
-      {
-        name: '苏宁',
-        type: 'line',
-        data: priceHistoryOfSN.value.map((item) => parseFloat(item.price))
-      }
-    ]
-  }
-
-  myChart.setOption(option)
+const jumpDetail = (url, description, image, price) => {
+  detailStore.setDetailGoodName(url)
+  detailStore.setDetailGoodFrom(activeWebsite.value)
+  detailStore.setDescription(description)
+  detailStore.setImage(image)
+  detailStore.setPrice(price)
+  router.push('/detail')
 }
 </script>
 
@@ -471,10 +399,6 @@ const initChart = () => {
   font-weight: 600;
 }
 
-.search-content {
-  margin-top: 20px;
-}
-
 .product-card {
   width: 100%;
   margin-bottom: 20px;
@@ -501,6 +425,12 @@ const initChart = () => {
 .button {
   padding: 0;
   min-height: auto;
+}
+
+.detail-info {
+  color: #409eff;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .content {

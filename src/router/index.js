@@ -30,6 +30,10 @@ const router = createRouter({
     {
       path: '/remainder',
       component: () => import('@/views/home/ReducePriceView.vue')
+    },
+    {
+      path: '/detail',
+      component: () => import('@/views/using/detailView.vue')
     }
   ]
 })

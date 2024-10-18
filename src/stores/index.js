@@ -8,3 +8,4 @@ export default pinia
 
 export * from './modules/user'
 export * from './modules/query'
+export * from './modules/detail'
