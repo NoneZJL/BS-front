@@ -17,7 +17,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item @click="jumpHome">个人主页</el-dropdown-item>
                 <el-dropdown-item @click="jumpHistory">历史记录</el-dropdown-item>
-                <el-dropdown-item @click="jumpRemainder">降价提醒</el-dropdown-item>
+                <el-dropdown-item @click="jumpRemainder">我的收藏</el-dropdown-item>
                 <el-dropdown-item @click="confirmLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -87,7 +87,7 @@
                   <div class="bottom">
                     <span class="price">¥{{ item.price }}</span>
                     <el-button type="text" class="button" @click="setRemainder(item.id)"
-                      >设置降价提醒</el-button
+                      >添加到收藏</el-button
                     >
                   </div>
                 </div>
