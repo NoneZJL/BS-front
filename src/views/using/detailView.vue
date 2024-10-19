@@ -22,7 +22,9 @@
         <el-card class="product-card">
           <el-row :gutter="20">
             <el-col :span="8">
-              <img :src="product.image" class="product-image" alt="Product Image" />
+              <div class="image-container">
+                <img :src="product.image" class="product-image" alt="Product Image" />
+              </div>
             </el-col>
             <el-col :span="16">
               <div class="product-details">
@@ -45,6 +47,7 @@ import router from '@/router'
 import { ref, onMounted } from 'vue'
 import { useUserStore, useDetailStore } from '@/stores/index'
 import * as echarts from 'echarts'
+import { queryDeatilGoodService } from '@/api/query'
 
 const userStore = useUserStore()
 const detailStore = useDetailStore()
@@ -56,23 +59,32 @@ const product = ref({
   price: ''
 })
 const priceHistory = ref([
-  { name: 'good', date: '2024-7-1', price: '39.60' },
-  { name: 'good', date: '2024-7-2', price: '29.80' },
-  { name: 'good', date: '2024-7-3', price: '39.20' },
-  { name: 'good', date: '2024-7-4', price: '49.90' },
-  { name: 'good', date: '2024-7-5', price: '19.60' }
+  { name: 'good', time: '2024-7-1', price: '39.60' },
+  { name: 'good', time: '2024-7-2', price: '29.80' },
+  { name: 'good', time: '2024-7-3', price: '39.20' },
+  { name: 'good', time: '2024-7-4', price: '49.90' },
+  { name: 'good', time: '2024-7-5', price: '19.60' }
 ])
 
-onMounted(() => {
+onMounted(async () => {
   username.value = userStore.username
   console.log('url = ' + detailStore.detailGoodName)
   console.log('from ' + detailStore.detailGoodFrom)
-  console.log('description = ' + detailStore.description)
   product.value.description = detailStore.description
-  console.log('img = ' + detailStore.image)
   product.value.image = detailStore.image
-  console.log('price = ' + detailStore.price)
   product.value.price = detailStore.price
+  const res = await queryDeatilGoodService(detailStore.detailGoodFrom, detailStore.detailGoodName)
+  if (res.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  const goodList = res.data.payload
+  console.log(goodList)
+  priceHistory.value = res.data.payload
   initChart()
 })
 
@@ -99,7 +111,7 @@ const initChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: priceHistory.value.map((item) => item.date)
+      data: priceHistory.value.map((item) => item.time)
     },
     yAxis: {
       type: 'value',
@@ -183,6 +195,13 @@ const initChart = () => {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 .product-image {
   width: 100%;
   border-top-left-radius: 10px;
@@ -205,6 +224,7 @@ const initChart = () => {
 }
 
 .search-content {
+  width: 100%;
   margin-top: 20px;
 }
 </style>
