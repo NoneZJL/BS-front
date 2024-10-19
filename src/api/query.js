@@ -17,3 +17,5 @@ export const insertRemainderService = (description, price, img, detailUrl, from)
 export const getRemaindersService = () => request.get('/getRemainsers')
 
 export const deleteRemainderService = (id) => request.get(`/deleteRemainder?id=${id}`)
+
+export const sendRemindEmailService = (id) => request.get(`/sendRemindEmail?id=${id}`)

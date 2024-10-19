@@ -39,9 +39,7 @@
                 <el-col :span="16">
                   <div class="product-details">
                     <h2 class="product-title">{{ product.description }}</h2>
-                    <el-button type="primary" plain @click="confirmCancelReminder(product.id)"
-                      >降价</el-button
-                    >
+                    <el-button type="primary" plain @click="sendEmail(product.id)">降价</el-button>
                     <el-button type="danger" plain @click="confirmCancelReminder(product.id)"
                       >取消收藏</el-button
                     >
@@ -60,7 +58,7 @@
 import router from '@/router'
 import { ref, onMounted } from 'vue'
 import { useUserStore, useQueryStore } from '@/stores/index'
-import { getRemaindersService, deleteRemainderService } from '@/api/query'
+import { getRemaindersService, deleteRemainderService, sendRemindEmailService } from '@/api/query'
 
 const userStore = useUserStore()
 const queryStore = useQueryStore()
@@ -139,6 +137,19 @@ const cancelReminder = async (goodId) => {
   }
   getRemainders()
   ElMessage.success('取消收藏成功')
+}
+
+const sendEmail = async (id) => {
+  const res = await sendRemindEmailService(id)
+  if (res.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  ElMessage.success('降价提醒发送成功')
 }
 </script>
 
