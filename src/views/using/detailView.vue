@@ -58,13 +58,7 @@ const product = ref({
   image: '',
   price: ''
 })
-const priceHistory = ref([
-  { name: 'good', time: '2024-7-1', price: '39.60' },
-  { name: 'good', time: '2024-7-2', price: '29.80' },
-  { name: 'good', time: '2024-7-3', price: '39.20' },
-  { name: 'good', time: '2024-7-4', price: '49.90' },
-  { name: 'good', time: '2024-7-5', price: '19.60' }
-])
+const priceHistory = ref([])
 
 onMounted(async () => {
   username.value = userStore.username
@@ -94,7 +88,7 @@ const back = () => {
   detailStore.removeImage()
   detailStore.removeDescription()
   detailStore.removePrice()
-  router.push('query')
+  router.back()
 }
 const initChart = () => {
   const chartDom = document.getElementById('priceHistoryChart')
