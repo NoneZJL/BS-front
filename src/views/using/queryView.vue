@@ -75,7 +75,11 @@
               :key="index"
             >
               <el-card :body-style="{ padding: '0px' }" class="product-card">
-                <img :src="item.img" class="image" @click="jumpUrl(item.detailUrl)" />
+                <img
+                  :src="item.img || defaultImage"
+                  class="image"
+                  @click="jumpUrl(item.detailUrl)"
+                />
                 <div style="padding: 14px">
                   <span class="description">{{ item.description }}</span>
                   <div class="bottom">
@@ -86,7 +90,10 @@
                       @click="jumpDetail(item.detailUrl, item.description, item.img, item.price)"
                       >商品详情</el-button
                     >
-                    <el-button type="text" class="button" @click="setRemainder(item.id)"
+                    <el-button
+                      type="text"
+                      class="button"
+                      @click="setRemainder(item.description, item.price, item.img, item.detailUrl)"
                       >添加到收藏</el-button
                     >
                   </div>
@@ -105,7 +112,7 @@
 import { ref, computed, onMounted } from 'vue'
 import router from '@/router/index'
 import { useUserStore, useQueryStore, useDetailStore } from '@/stores/index'
-import { queryGoodService } from '@/api/query'
+import { queryGoodService, insertRemainderService } from '@/api/query'
 import { jdGetGoodsBySearchingNameService } from '@/api/jd'
 import { snGetGoodsBySearchingNameService } from '@/api/sn'
 import { wphGetGoodsBySearchingNameService } from '@/api/wph'
@@ -117,6 +124,7 @@ const userStore = useUserStore()
 const queryStore = useQueryStore()
 const detailStore = useDetailStore()
 const activeWebsite = ref('jd')
+const defaultImage = 'https://via.placeholder.com/150'
 
 onMounted(async () => {
   username.value = userStore.username
@@ -216,14 +224,29 @@ const confirmLogout = () => {
     .catch(() => {})
 }
 
-const setRemainder = (id) => {
+const setRemainder = (description, price, img, detailUrl) => {
   ElMessageBox.confirm('确定要添加到收藏吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
   })
-    .then(() => {
-      console.log(id)
+    .then(async () => {
+      const res = await insertRemainderService(
+        description,
+        price,
+        img,
+        detailUrl,
+        activeWebsite.value
+      )
+      if (res.data.code === 2) {
+        router.push('/login')
+        return
+      }
+      if (res.data.code === 1) {
+        ElMessage.error(res.data.err)
+        return
+      }
+      ElMessage.success('成功添加到收藏')
     })
     .catch(() => {})
 }

@@ -10,3 +10,6 @@ export const deleteSingleHistoryByNameService = (goodName) =>
 export const deleteAllHistoryService = () => request.get('/deleteAllHistory')
 
 export const queryDeatilGoodService = (from, url) => request.post('/getDetail', { from, url })
+
+export const insertRemainderService = (description, price, img, detailUrl, from) =>
+  request.post('/insertRemainder', { description, price, img, detailUrl, from })
