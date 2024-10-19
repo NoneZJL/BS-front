@@ -90,6 +90,7 @@ const back = () => {
   detailStore.removePrice()
   router.back()
 }
+
 const initChart = () => {
   const chartDom = document.getElementById('priceHistoryChart')
   if (!chartDom) return

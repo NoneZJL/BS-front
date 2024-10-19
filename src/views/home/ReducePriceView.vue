@@ -29,13 +29,25 @@
         <el-row type="flex" justify="center" class="remainder-goods">
           <el-col :span="12">
             <span class="remainder-title">我的收藏</span>
-            <el-card v-for="good in remainderGoods" :key="good.id" class="good-item">
-              <div class="good-content">
-                <span>{{ good.name }}</span>
-                <el-button type="danger" plain @click="confirmCancelReminder(good.id)"
-                  >取消收藏</el-button
-                >
-              </div>
+            <el-card v-for="product in remainderGoods" :key="product.id" class="product-card">
+              <el-row :gutter="20">
+                <el-col :span="8">
+                  <div class="image-container">
+                    <img :src="product.img" class="product-image" alt="Product Image" />
+                  </div>
+                </el-col>
+                <el-col :span="16">
+                  <div class="product-details">
+                    <h2 class="product-title">{{ product.description }}</h2>
+                    <el-button type="primary" plain @click="confirmCancelReminder(product.id)"
+                      >降价</el-button
+                    >
+                    <el-button type="danger" plain @click="confirmCancelReminder(product.id)"
+                      >取消收藏</el-button
+                    >
+                  </div>
+                </el-col>
+              </el-row>
             </el-card>
           </el-col>
         </el-row>
@@ -46,20 +58,32 @@
 
 <script setup>
 import router from '@/router'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUserStore, useQueryStore } from '@/stores/index'
+import { getRemaindersService, deleteRemainderService } from '@/api/query'
 
 const userStore = useUserStore()
 const queryStore = useQueryStore()
 const username = ref(userStore.username)
 
-const remainderGoods = ref([
-  { id: 1, name: 'good01' },
-  { id: 2, name: 'good02' },
-  { id: 3, name: 'good03' },
-  { id: 4, name: 'good04' },
-  { id: 5, name: 'good05' }
-])
+const remainderGoods = ref([])
+
+onMounted(async () => {
+  getRemainders()
+})
+
+const getRemainders = async () => {
+  const res = await getRemaindersService()
+  if (res.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  remainderGoods.value = res.data.payload
+}
 
 const confirmLogout = () => {
   ElMessageBox.confirm('确定要退出登录吗？', '提示', {
@@ -103,11 +127,18 @@ const confirmCancelReminder = (goodId) => {
     .catch(() => {})
 }
 
-const cancelReminder = (goodId) => {
-  // 在这里添加取消降价提醒的逻辑
-  console.log(`取消降价提醒的商品ID: ${goodId}`)
-  // 例如，你可以从 remainderGoods 中移除该商品
-  remainderGoods.value = remainderGoods.value.filter((good) => good.id !== goodId)
+const cancelReminder = async (goodId) => {
+  const res = await deleteRemainderService(goodId)
+  if (res.data.code === 2) {
+    router.push('/login')
+    return
+  }
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    return
+  }
+  getRemainders()
+  ElMessage.success('取消收藏成功')
 }
 </script>
 
@@ -177,19 +208,38 @@ const cancelReminder = (goodId) => {
   color: #409eff;
 }
 
-.good-item {
-  margin-bottom: 10px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.12),
-    0 0 6px rgba(0, 0, 0, 0.04);
+.product-card {
+  max-width: 800px;
+  margin: 20px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.good-content {
+.image-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 10px;
+  height: 100%;
+}
+
+.product-image {
+  width: 100%;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.product-details {
+  padding: 20px;
+}
+
+.product-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.search-content {
+  width: 100%;
+  margin-top: 20px;
 }
 </style>

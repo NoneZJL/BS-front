@@ -13,3 +13,7 @@ export const queryDeatilGoodService = (from, url) => request.post('/getDetail', 
 
 export const insertRemainderService = (description, price, img, detailUrl, from) =>
   request.post('/insertRemainder', { description, price, img, detailUrl, from })
+
+export const getRemaindersService = () => request.get('/getRemainsers')
+
+export const deleteRemainderService = (id) => request.get(`/deleteRemainder?id=${id}`)
