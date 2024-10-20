@@ -120,6 +120,10 @@ const confirmLogout = () => {
     .then(() => {
       userStore.removeToken()
       queryStore.removeQueringName()
+      queryStore.removeJdProducts()
+      queryStore.removeSnProducts()
+      queryStore.removeWphProducts()
+      queryStore.removeWebsite()
       logout()
     })
     .catch(() => {})
@@ -128,8 +132,8 @@ const confirmLogout = () => {
 const handleHistoryClick = (item) => {
   console.log('点击了历史记录:', item)
   queryStore.setQueryingName(item)
+  queryStore.setRefresh()
   router.push('/query')
-  // 在这里添加你的点击历史记录后的逻辑
 }
 
 const deleteHistoryItem = async (name) => {

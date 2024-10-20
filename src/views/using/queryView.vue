@@ -128,6 +128,14 @@ const defaultImage = 'https://via.placeholder.com/150'
 
 onMounted(async () => {
   username.value = userStore.username
+  if (queryStore.toRefresh === false) {
+    nowSearching.value = queryStore.queryingName
+    jdProducts.value = queryStore.jdProducts
+    snProducts.value = queryStore.snProducts
+    wphProducts.value = queryStore.wphProducts
+    activeWebsite.value = queryStore.website
+    return
+  }
   if (!queryStore.isQueryingNameEmpty()) {
     nowSearching.value = queryStore.queryingName
     const loading = ElLoading.service({
@@ -147,6 +155,7 @@ onMounted(async () => {
     }
     const JDgoodList = JDanswer.data.payload
     jdProducts.value = JDgoodList.map((item) => item)
+    queryStore.setJdProducts(jdProducts.value)
     // loading.close()
     // SN
     const SNanswer = await snGetGoodsBySearchingNameService(nowSearching.value)
@@ -160,6 +169,7 @@ onMounted(async () => {
     }
     const SNgoodList = SNanswer.data.payload
     snProducts.value = SNgoodList.map((item) => item)
+    queryStore.setSnProducts(snProducts.value)
     // WPH
     const WPHanswer = await wphGetGoodsBySearchingNameService(nowSearching.value)
     if (WPHanswer.data.code === 2) {
@@ -172,8 +182,11 @@ onMounted(async () => {
     }
     const WPHgoodList = WPHanswer.data.payload
     wphProducts.value = WPHgoodList.map((item) => item)
+    queryStore.setWphProducts(wphProducts.value)
     loading.close()
   }
+  activeWebsite.value = 'jd'
+  queryStore.resetRefresh()
 })
 
 const jdProducts = ref([])
@@ -219,6 +232,10 @@ const confirmLogout = () => {
       userStore.removeToken()
       userStore.removeUsername()
       queryStore.removeQueringName()
+      queryStore.removeJdProducts()
+      queryStore.removeSnProducts()
+      queryStore.removeWphProducts()
+      queryStore.removeWebsite()
       logout()
     })
     .catch(() => {})
@@ -292,6 +309,7 @@ const handleSearch = async () => {
   }
   const JDgoodList = JDanswer.data.payload
   jdProducts.value = JDgoodList.map((item) => item)
+  queryStore.setJdProducts(jdProducts.value)
   // loading.close()
   // SN
   const SNanswer = await snGetGoodsBySearchingNameService(nowSearching.value)
@@ -305,6 +323,7 @@ const handleSearch = async () => {
   }
   const SNgoodList = SNanswer.data.payload
   snProducts.value = SNgoodList.map((item) => item)
+  queryStore.setSnProducts(snProducts.value)
   // WPH
   const WPHanswer = await wphGetGoodsBySearchingNameService(nowSearching.value)
   if (WPHanswer.data.code === 2) {
@@ -317,11 +336,14 @@ const handleSearch = async () => {
   }
   const WPHgoodList = WPHanswer.data.payload
   wphProducts.value = WPHgoodList.map((item) => item)
+  queryStore.setWphProducts(wphProducts.value)
+
   loading.close()
-  // 在这里添加你的搜索逻辑
+  activeWebsite.value = 'jd'
 }
 
 const jumpDetail = (url, description, image, price) => {
+  queryStore.setWebsite(activeWebsite.value)
   detailStore.setDetailGoodName(url)
   detailStore.setDetailGoodFrom(activeWebsite.value)
   detailStore.setDescription(description)

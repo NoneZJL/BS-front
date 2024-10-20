@@ -88,7 +88,7 @@ const back = () => {
   detailStore.removeImage()
   detailStore.removeDescription()
   detailStore.removePrice()
-  router.back()
+  router.push('/query')
 }
 
 const initChart = () => {
