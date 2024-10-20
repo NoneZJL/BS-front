@@ -106,9 +106,10 @@ import {
 } from '@/api/user'
 import router from '@/router/index'
 import { ref, onMounted, computed } from 'vue'
-import { useUserStore } from '@/stores/index'
+import { useUserStore, useQueryStore } from '@/stores/index'
 
 const userStore = useUserStore()
+const queryStore = useQueryStore()
 
 const loginByUsername = ref(true)
 
@@ -164,8 +165,11 @@ const registerVisible = ref(false)
 
 onMounted(() => {
   userStore.removeEmailCode()
-  userStore.removeToken()
-  userStore.removeUsername()
+  // userStore.removeToken()
+  // userStore.removeUsername()
+  if (userStore.token) {
+    router.push('/query')
+  }
 })
 
 const validateRepassword = (rule, value, callback) => {
@@ -283,6 +287,11 @@ const userLogin = async () => {
   ElMessage.success('登录成功')
   userStore.setToken(res.data.payload)
   userStore.setUsername(login.value.name)
+  queryStore.removeJdProducts()
+  queryStore.removeSnProducts()
+  queryStore.removeWphProducts()
+  queryStore.removeQueringName()
+
   router.push('/query')
 }
 
