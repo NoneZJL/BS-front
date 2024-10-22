@@ -39,10 +39,17 @@
                 <el-col :span="16">
                   <div class="product-details">
                     <h2 class="product-title">{{ product.description }}</h2>
-                    <el-button type="primary" plain @click="sendEmail(product.id)">降价</el-button>
-                    <el-button type="danger" plain @click="confirmCancelReminder(product.id)"
-                      >取消收藏</el-button
+                    <el-button
+                      type="primary"
+                      plain
+                      @click="sendEmail(product.id)"
+                      :disabled="product.isSending"
                     >
+                      {{ product.isSending ? `${product.countdown}s后可再次发送` : '降价' }}
+                    </el-button>
+                    <el-button type="danger" plain @click="confirmCancelReminder(product.id)">
+                      取消收藏
+                    </el-button>
                   </div>
                 </el-col>
               </el-row>
@@ -80,7 +87,11 @@ const getRemainders = async () => {
     ElMessage.error(res.data.err)
     return
   }
-  remainderGoods.value = res.data.payload
+  remainderGoods.value = res.data.payload.map((product) => ({
+    ...product,
+    isSending: false,
+    countdown: 20
+  }))
 }
 
 const confirmLogout = () => {
@@ -145,6 +156,11 @@ const cancelReminder = async (goodId) => {
 }
 
 const sendEmail = async (id) => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: '发送中',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
   const res = await sendRemindEmailService(id)
   if (res.data.code === 2) {
     router.push('/login')
@@ -155,6 +171,21 @@ const sendEmail = async (id) => {
     return
   }
   ElMessage.success('降价提醒发送成功')
+  loading.close()
+
+  const product = remainderGoods.value.find((p) => p.id === id)
+  if (!product) return
+
+  product.isSending = true
+  product.countdown = 20
+
+  const countdownInterval = setInterval(() => {
+    product.countdown -= 1
+    if (product.countdown <= 0) {
+      clearInterval(countdownInterval)
+      product.isSending = false
+    }
+  }, 1000)
 }
 </script>
 
