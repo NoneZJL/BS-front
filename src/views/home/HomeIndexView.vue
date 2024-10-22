@@ -136,6 +136,7 @@ const confirmLogout = () => {
   })
     .then(() => {
       userStore.removeToken()
+      userStore.removeUsername()
       queryStore.removeQueringName()
       queryStore.removeJdProducts()
       queryStore.removeSnProducts()
