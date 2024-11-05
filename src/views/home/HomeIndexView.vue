@@ -56,7 +56,7 @@
     </el-container>
 
     <!-- 修改信息的弹出表单 -->
-    <el-dialog title="修改信息" v-model="editFormVisible" width="40%">
+    <el-dialog title="修改信息" v-model="editFormVisible" width="40%" :fullscreen="isMobile">
       <el-form :model="editForm" :rules="editFormRules" ref="editFormRef">
         <el-form-item label="手机号" prop="phone">
           <el-input v-model="editForm.phone" placeholder="请输入手机号"></el-input>
@@ -77,7 +77,7 @@
 
 <script setup>
 import router from '@/router'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useUserStore, useQueryStore } from '@/stores/index'
 import { getUserInfoService, updateUserInfoService } from '@/api/user'
 
@@ -189,6 +189,11 @@ const submitEditForm = async () => {
   editFormVisible.value = false
   ElMessage.success('信息修改成功')
 }
+
+// 判断是否为手机端
+const isMobile = computed(() => {
+  return window.innerWidth <= 768
+})
 </script>
 
 <style scoped>
@@ -280,5 +285,38 @@ const submitEditForm = async () => {
   display: flex;
   justify-content: flex-end;
   margin-top: 20px;
+}
+
+/* 手机端适配 */
+@media (max-width: 768px) {
+  .user-info-card {
+    width: 90%;
+  }
+
+  .user-info-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-icon {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .user-info-details {
+    margin-left: 0;
+  }
+
+  .user-name {
+    font-size: 20px;
+  }
+
+  .user-email {
+    font-size: 14px;
+  }
+
+  .edit-button-container {
+    justify-content: center;
+  }
 }
 </style>

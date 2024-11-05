@@ -331,6 +331,7 @@ const handleSearch = async () => {
     return
   }
   if (WPHanswer.data.code === 1) {
+    console.log(WPHanswer)
     ElMessage.error(WPHanswer.data.err)
     return
   }
