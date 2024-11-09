@@ -27,32 +27,28 @@
       <el-main>
         <el-button type="info" plain @click="back">返回</el-button>
         <el-row type="flex" justify="center" class="remainder-goods">
-          <el-col :span="12">
+          <el-col :span="24">
             <span class="remainder-title">我的收藏</span>
             <el-card v-for="product in remainderGoods" :key="product.id" class="product-card">
-              <el-row :gutter="20">
-                <el-col :span="8">
-                  <div class="image-container">
-                    <img :src="product.img" class="product-image" alt="Product Image" />
-                  </div>
-                </el-col>
-                <el-col :span="16">
-                  <div class="product-details">
-                    <h2 class="product-title">{{ product.description }}</h2>
-                    <el-button
-                      type="primary"
-                      plain
-                      @click="sendEmail(product.id)"
-                      :disabled="product.isSending"
-                    >
-                      {{ product.isSending ? `${product.countdown}s后可再次发送` : '降价' }}
-                    </el-button>
-                    <el-button type="danger" plain @click="confirmCancelReminder(product.id)">
-                      取消收藏
-                    </el-button>
-                  </div>
-                </el-col>
-              </el-row>
+              <div class="product-content">
+                <div class="image-container">
+                  <img :src="product.img" class="product-image" alt="Product Image" />
+                </div>
+                <div class="product-details">
+                  <h2 class="product-title">{{ product.description }}</h2>
+                  <el-button
+                    type="primary"
+                    plain
+                    @click="sendEmail(product.id)"
+                    :disabled="product.isSending"
+                  >
+                    {{ product.isSending ? `${product.countdown}s后可再次发送` : '降价' }}
+                  </el-button>
+                  <el-button type="danger" plain @click="confirmCancelReminder(product.id)">
+                    取消收藏
+                  </el-button>
+                </div>
+              </div>
             </el-card>
           </el-col>
         </el-row>
@@ -262,6 +258,11 @@ const sendEmail = async (id) => {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.product-content {
+  display: flex;
+  flex-direction: column;
+}
+
 .image-container {
   display: flex;
   justify-content: center;
@@ -270,9 +271,8 @@ const sendEmail = async (id) => {
 }
 
 .product-image {
-  width: 100%;
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+  width: 350px;
+  border-radius: 10px 10px 0 0;
 }
 
 .product-details {
@@ -288,5 +288,54 @@ const sendEmail = async (id) => {
 .search-content {
   width: 100%;
   margin-top: 20px;
+}
+
+/* 手机端适配 */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 10px;
+  }
+
+  .price-compare {
+    font-size: 20px;
+  }
+
+  .toolbar {
+    right: 10px;
+  }
+
+  .remainder-title {
+    font-size: 20px;
+  }
+
+  .product-card {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .product-title {
+    font-size: 16px;
+  }
+
+  .el-button {
+    font-size: 14px;
+  }
+
+  .product-image {
+    width: 100%;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .product-details {
+    padding: 10px;
+  }
+
+  .product-title {
+    font-size: 16px;
+  }
+
+  .el-button {
+    font-size: 12px;
+  }
 }
 </style>

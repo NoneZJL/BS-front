@@ -299,6 +299,7 @@ const handleSearch = async () => {
 
   // JD
   const JDanswer = await jdGetGoodsBySearchingNameService(nowSearching.value)
+  console.log(JDanswer)
   if (JDanswer.data.code === 2) {
     router.push('/login')
     return
@@ -313,6 +314,7 @@ const handleSearch = async () => {
   // loading.close()
   // SN
   const SNanswer = await snGetGoodsBySearchingNameService(nowSearching.value)
+  console.log(SNanswer)
   if (SNanswer.data.code === 2) {
     router.push('/login')
     return
@@ -326,6 +328,7 @@ const handleSearch = async () => {
   queryStore.setSnProducts(snProducts.value)
   // WPH
   const WPHanswer = await wphGetGoodsBySearchingNameService(nowSearching.value)
+  console.log(WPHanswer)
   if (WPHanswer.data.code === 2) {
     router.push('/login')
     return

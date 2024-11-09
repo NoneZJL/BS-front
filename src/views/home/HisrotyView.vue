@@ -240,7 +240,7 @@ const confirmDeleteAll = () => {
 }
 
 .history-card {
-  width: 50%;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -298,5 +298,46 @@ const confirmDeleteAll = () => {
 .delete-all-button:hover {
   background-color: #f56c6c;
   color: white;
+}
+
+/* 手机端适配 */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 10px;
+  }
+
+  .price-compare {
+    font-size: 20px;
+  }
+
+  .toolbar {
+    right: 10px;
+  }
+
+  .button-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .button-container .el-button {
+    margin-bottom: 0;
+  }
+
+  .history-card {
+    width: 90%;
+  }
+
+  .history-title {
+    font-size: 20px;
+  }
+
+  .history-item {
+    padding: 8px;
+  }
+
+  .delete-all-button {
+    margin-right: 0;
+  }
 }
 </style>
