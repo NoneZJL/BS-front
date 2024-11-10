@@ -52,7 +52,7 @@
             <el-tab-pane name="wph">
               <template #label>
                 <el-icon><Shop /></el-icon>
-                <span style="margin-left: 5px">唯品会</span>
+                <span style="margin-left: 5px">小米有品</span>
               </template>
             </el-tab-pane>
             <el-tab-pane name="sn">
