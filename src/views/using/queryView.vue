@@ -127,6 +127,10 @@ const activeWebsite = ref('jd')
 const defaultImage = 'https://via.placeholder.com/150'
 
 onMounted(async () => {
+  if (userStore.token === '') {
+    ElMessage.error('请先登录')
+    router.push('/login')
+  }
   username.value = userStore.username
   if (queryStore.toRefresh === false) {
     nowSearching.value = queryStore.queryingName

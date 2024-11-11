@@ -70,6 +70,10 @@ const username = ref(userStore.username)
 const remainderGoods = ref([])
 
 onMounted(async () => {
+  if (userStore.token === '') {
+    ElMessage.error('请先登录')
+    router.push('/login')
+  }
   getRemainders()
 })
 

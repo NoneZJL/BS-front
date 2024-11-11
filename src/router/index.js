@@ -38,18 +38,4 @@ const router = createRouter({
   ]
 })
 
-const needLoginPath = ['/query', '/home', '/history', '/remainder', '/detail']
-
-router.beforeEach((to, from, next) => {
-  const isToNeedLogin = needLoginPath.includes(to.path)
-  const isFromNeedLogin = needLoginPath.includes(from.path)
-
-  if (isToNeedLogin && !isFromNeedLogin) {
-    ElMessage.error('请先登录')
-    next('/login')
-  } else {
-    next()
-  }
-})
-
 export default router

@@ -61,6 +61,10 @@ const product = ref({
 const priceHistory = ref([])
 
 onMounted(async () => {
+  if (userStore.token === '') {
+    ElMessage.error('请先登录')
+    router.push('/login')
+  }
   username.value = userStore.username
   console.log('url = ' + detailStore.detailGoodName)
   console.log('from ' + detailStore.detailGoodFrom)

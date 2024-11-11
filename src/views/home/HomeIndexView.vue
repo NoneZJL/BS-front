@@ -108,6 +108,10 @@ const editFormRules = ref({
 })
 
 onMounted(() => {
+  if (userStore.token === '') {
+    ElMessage.error('请先登录')
+    router.push('/login')
+  }
   userInfo.value.username = userStore.username
   getUserInfo()
 })
