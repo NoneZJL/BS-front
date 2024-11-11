@@ -222,13 +222,23 @@ const getVerificationCode = async () => {
     return
   }
 
+  const loading = ElLoading.service({
+    lock: true,
+    text: '发送中',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
   const res = await getEmailCodeService(register.value.email)
-  console.log(res)
+  if (res.data.code === 1) {
+    ElMessage.error(res.data.err)
+    loading.close()
+    return
+  }
   userStore.setEmailCode(res.data.payload)
   if (countdownActive.value) return // 如果已经在倒计时，直接返回
   countdownActive.value = true // 开始倒计时
   // 设置提示信息
   ElMessage.success('验证码已发送！')
+  loading.close()
 
   const countdownInterval = setInterval(() => {
     verificationCountdown.value--

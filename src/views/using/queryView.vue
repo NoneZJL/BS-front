@@ -155,6 +155,7 @@ onMounted(async () => {
     }
     if (JDanswer.data.code === 1) {
       ElMessage.error(JDanswer.data.err)
+      loading.close()
       return
     }
     const JDgoodList = JDanswer.data.payload
@@ -169,6 +170,7 @@ onMounted(async () => {
     }
     if (SNanswer.data.code === 1) {
       ElMessage.error(SNanswer.data.err)
+      loading.close()
       return
     }
     const SNgoodList = SNanswer.data.payload
@@ -182,6 +184,7 @@ onMounted(async () => {
     }
     if (WPHanswer.data.code === 1) {
       ElMessage.error(WPHanswer.data.err)
+      loading.close()
       return
     }
     const WPHgoodList = WPHanswer.data.payload
@@ -310,6 +313,7 @@ const handleSearch = async () => {
   }
   if (JDanswer.data.code === 1) {
     ElMessage.error(JDanswer.data.err)
+    loading.close()
     return
   }
   const JDgoodList = JDanswer.data.payload
@@ -325,6 +329,7 @@ const handleSearch = async () => {
   }
   if (SNanswer.data.code === 1) {
     ElMessage.error(SNanswer.data.err)
+    loading.close()
     return
   }
   const SNgoodList = SNanswer.data.payload
@@ -340,6 +345,7 @@ const handleSearch = async () => {
   if (WPHanswer.data.code === 1) {
     console.log(WPHanswer)
     ElMessage.error(WPHanswer.data.err)
+    loading.close()
     return
   }
   const WPHgoodList = WPHanswer.data.payload

@@ -136,12 +136,19 @@ const getVerificationCode = async () => {
 
   if (countdownActive.value) return // 如果已经在倒计时，直接返回
 
+  const loading = ElLoading.service({
+    lock: true,
+    text: '发送中',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
   const res = await getEmailCodeInForgetPasswordService(findback.value.email)
   if (res.data.code === 1) {
     ElMessage.error(res.data.err)
+    loading.close()
     return
   }
   userStore.setEmailCode(res.data.payload)
+  loading.close()
   ElMessage.success('验证码发送成功')
 
   countdownActive.value = true // 开始倒计时

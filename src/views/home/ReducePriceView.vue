@@ -168,6 +168,7 @@ const sendEmail = async (id) => {
   }
   if (res.data.code === 1) {
     ElMessage.error(res.data.err)
+    loading.close()
     return
   }
   ElMessage.success('降价提醒发送成功')
