@@ -142,6 +142,7 @@ onMounted(async () => {
   }
   if (!queryStore.isQueryingNameEmpty()) {
     nowSearching.value = queryStore.queryingName
+    queryStore.removeQueringName()
     const loading = ElLoading.service({
       lock: true,
       text: '搜索中',
