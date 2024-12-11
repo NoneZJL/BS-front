@@ -1,35 +1,37 @@
-# PriceComWebFrontend
+# 商品比价网站前端启动方式
 
-This template should help get you started developing with Vue 3 in Vite.
+## 1 仓库克隆
 
-## Recommended IDE Setup
+创建一个你想要放置本商品比价网站整体项目的文件夹，然后进入文件夹并且启动终端
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+```sh
+git clone https://github.com/NoneZJL/BS-front.git
+```
 
-## Customize configuration
+## 2 项目依赖配置及运行
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+如果你只有 npm 而没有安装 pnpm，请首先安装 pnpm
 
-## Project Setup
+```sh
+npm install -g pnpm
+```
+
+安装完 pnpm 之后就可以安装项目依赖
 
 ```sh
 pnpm install
 ```
 
-### Compile and Hot-Reload for Development
+接着就可以启动项目
 
 ```sh
 pnpm dev
 ```
 
-### Compile and Minify for Production
+此时项目就已经成功启动了，你可以打开本地浏览器来进行访问
 
 ```sh
-pnpm build
+http://localhost:5173/
 ```
 
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-pnpm lint
-```
+到此为止，前端可以在本地环境中正常运行
