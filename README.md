@@ -19,6 +19,10 @@ npm install -g pnpm
 安装完 pnpm 之后就可以安装项目依赖
 
 ```sh
+# 首先进入刚刚克隆的前端仓库
+cd BS-front
+
+# 然后就可以安装依赖
 pnpm install
 ```
 
